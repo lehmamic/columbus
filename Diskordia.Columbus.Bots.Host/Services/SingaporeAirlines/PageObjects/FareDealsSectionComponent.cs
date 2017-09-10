@@ -30,7 +30,7 @@ namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines.PageObjects
 		{
 			get
 			{
-				return this.driver.FindElement(By.ClassName("select__text")).Text;
+				return this.element.FindElement(By.ClassName("select__text")).Text;
 			}
 		}
 
@@ -38,7 +38,7 @@ namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines.PageObjects
 		{
 			get
 			{
-				return this.driver.FindElements(By.CssSelector(".fare-deals-list li"))
+				return this.element.FindElements(By.CssSelector(".fare-deals-list li"))
 					       		  .Where(e => !string.IsNullOrWhiteSpace(e.FindElement(By.ClassName("link")).Text))
 					       		  .Select(e => new FareDealsListItemComponent(this.driver, e));
 			}
