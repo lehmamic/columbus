@@ -50,17 +50,22 @@ namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines
 
 			if (fareDealsSection != null)
 			{
-				foreach (var fareDeal in fareDealsSection.FareDeals)
+				foreach (string airport in fareDealsSection.AvailableDepatureAirports)
 				{
-					yield return new FareDeal
+					fareDealsSection.SelectDepartureAirport(airport);
+
+					foreach (var fareDeal in fareDealsSection.FareDeals)
 					{
-						Link = new Uri(fareDeal.Link),
-						DepartureAirport = fareDealsSection.DepartureAirport,
-						DestinationAirport = fareDeal.DestinationAirport,
-						Class = fareDeal.Class,
-						Currency = Regex.Match(fareDeal.PriceLabel, @"[A-Z]{3}").Value,
-						Price = Decimal.Parse(Regex.Match(fareDeal.PriceValue, @"\d+(\.\d+)?").Value)
-					};
+						yield return new FareDeal
+						{
+							Link = new Uri(fareDeal.Link),
+							DepartureAirport = fareDealsSection.DepartureAirport,
+							DestinationAirport = fareDeal.DestinationAirport,
+							Class = fareDeal.Class,
+							Currency = Regex.Match(fareDeal.PriceLabel, @"[A-Z]{3}").Value,
+							Price = Decimal.Parse(Regex.Match(fareDeal.PriceValue, @"\d+(\.\d+)?").Value)
+						};
+					}
 				}
 			}
 		}
