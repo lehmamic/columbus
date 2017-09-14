@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Diskordia.Columbus.Bots.Host.Services;
-using Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines;
-using Microsoft.Extensions.Configuration;
+using Diskordia.Columbus.Bots.Services;
+using Diskordia.Columbus.Bots.Services.SingaporeAirlines;
 
-namespace Diskordia.Columbus.Bots.Host
+namespace Diskordia.Columbus.BackgroundWorker
 {
 	class Program
 	{

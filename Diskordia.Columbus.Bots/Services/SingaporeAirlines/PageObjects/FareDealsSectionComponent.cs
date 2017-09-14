@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
-namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.Bots.Services.SingaporeAirlines.PageObjects
 {
 	public class FareDealsSectionComponent
 	{

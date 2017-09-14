@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Diskordia.Columbus.Bots.Host.Services
+namespace Diskordia.Columbus.Bots.Services
 {
 	public interface IFareDealService
 	{

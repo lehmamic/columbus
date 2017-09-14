@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenQA.Selenium;
 
-namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.Bots.Services.SingaporeAirlines.PageObjects
 {
 	public class FareDealPage
 	{

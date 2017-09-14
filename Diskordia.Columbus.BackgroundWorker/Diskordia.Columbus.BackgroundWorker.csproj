@@ -4,21 +4,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Services\SingaporeAirlines\" />
-    <Folder Include="Services\SingaporeAirlines\PageObjects\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Selenium.WebDriver" Version="3.5.2" />
-    <PackageReference Include="Selenium.Support" Version="3.5.2" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.32.0" />
-    <PackageReference Include="System.Security.Permissions" Version="4.4.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diskordia.Columbus.Bots\Diskordia.Columbus.Bots.csproj" />
   </ItemGroup>
 </Project>
