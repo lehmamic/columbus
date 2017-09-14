@@ -56,9 +56,17 @@ namespace Diskordia.Columbus.Bots.Host.Services.SingaporeAirlines.PageObjects
 
 		public void SelectDepartureAirport(string airport)
 		{
-			this.element.FindElement(By.ClassName("custom-select")).Click();
+			IWebElement customSelectElement = this.element.FindElement(By.ClassName("custom-select"));
 
-			var optionElement = this.driver.FindElements(By.CssSelector("#customSelect-19-listbox li"))
+			// e.g. customSelect-19-combobox
+			string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
+
+			// in this case customSelect-19-listbox
+			string optionElementId = inputOverlayId.Replace("combobox", "listbox");
+
+			customSelectElement.Click();
+
+			var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
 				.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), airport, StringComparison.OrdinalIgnoreCase));
 
 			if(optionElement !=null)
