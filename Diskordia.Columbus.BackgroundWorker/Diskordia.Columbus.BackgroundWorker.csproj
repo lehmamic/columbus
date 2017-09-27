@@ -19,4 +19,15 @@
     <ProjectReference Include="..\Diskordia.Columbus.Bots\Diskordia.Columbus.Bots.csproj" />
     <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="appsettings %28copy%29.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.prod.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
