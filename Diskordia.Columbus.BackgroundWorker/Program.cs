@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Diskordia.Columbus.Bots.Services;
-using Diskordia.Columbus.Bots.Services.SingaporeAirlines;
+using Diskordia.Columbus.Bots;
+using Diskordia.Columbus.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Diskordia.Columbus.BackgroundWorker
 {
@@ -11,28 +12,15 @@ namespace Diskordia.Columbus.BackgroundWorker
 		{
 			Console.WriteLine("Hello World!");
 
-			//var builder = new ConfigurationBuilder()
-			//.SetBasePath(System.IO.Directory.GetCurrentDirectory())
-			//.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-			//.AddEnvironmentVariables();
 
-			//IConfigurationRoot configuration = builder.Build();
+			var serviceProvider = new ServiceCollection()
+				.AddFareDealBots()
+				.BuildServiceProvider();
 
-			//var settings = new MySettings();
-			//configuration.Bind(settings);
-
-			IFareDealService service = new SingaporeAirlinesFareDealService();
-			IEnumerable<FareDeal> fareDeals = service.SearchFareDeals();
-
-			foreach (var fareDeal in fareDeals)
+			IEnumerable<IStartable> modules = serviceProvider.GetServices<IStartable>();
+			foreach(var module in modules)
 			{
-				Console.WriteLine($"Found fare deal from {fareDeal.DepartureAirport} to {fareDeal.DestinationAirport}.");
-
-				Console.WriteLine($"Price: {fareDeal.Price} {fareDeal.Currency}");
-				Console.WriteLine($"Class: {fareDeal.Class}");
-				Console.WriteLine($"Book by: {fareDeal.BookBy}");
-				Console.WriteLine($"Outbound travel period: {fareDeal.OutboundStartDate} to {fareDeal.OutboundEndDate}");
-				Console.WriteLine($"Travel complete date: {fareDeal.TravelCompleteDate}");
+				module.Start();
 			}
 		}
 	}
