@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Diskordia.Columbus.Bots.Services.SingaporeAirlines.PageObjects;
+using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-namespace Diskordia.Columbus.Bots.Services.SingaporeAirlines
+namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 {
 	public class SingaporeAirlinesFareDealService : IFareDealService
 	{

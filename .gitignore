@@ -288,4 +288,4 @@ __pycache__/
 *.xsd.cs
 
 # app specific
-appsettings.dev.json
+**/appsettings.development.json

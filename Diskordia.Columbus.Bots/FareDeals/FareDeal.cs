@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Diskordia.Columbus.Bots.Services
+namespace Diskordia.Columbus.Bots.FareDeals
 {
 	public class FareDeal
 	{

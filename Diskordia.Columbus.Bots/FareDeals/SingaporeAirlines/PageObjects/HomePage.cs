@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OpenQA.Selenium;
 
-namespace Diskordia.Columbus.Bots.Services.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
 	public class HomePage
 	{

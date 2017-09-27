@@ -1,6 +1,6 @@
 ﻿using System;
-using Diskordia.Columbus.Bots.Services;
-using Diskordia.Columbus.Bots.Services.SingaporeAirlines;
+using Diskordia.Columbus.Bots.FareDeals;
+using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines;
 using Diskordia.Columbus.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

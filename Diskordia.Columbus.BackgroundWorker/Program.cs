@@ -24,9 +24,10 @@ namespace Diskordia.Columbus.BackgroundWorker
 			
 			var configuration = builder.Build();
 
-			var serviceProvider = new ServiceCollection(configuration)
+			var serviceProvider = new ServiceCollection()
 				.AddOptions()
-				.AddFareDealBots()
+				.AddSerializer()
+				.AddFareDealBots(configuration)
 				.BuildServiceProvider();
 
 			IEnumerable<IStartable> modules = serviceProvider.GetServices<IStartable>();
