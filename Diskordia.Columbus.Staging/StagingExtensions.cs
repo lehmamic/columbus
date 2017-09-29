@@ -8,7 +8,7 @@ namespace Diskordia.Columbus.Staging
 {
 	public static class StagingExtensions
 	{
-		public static IServiceCollection AddFareDealStaging(this IServiceCollection services, IConfigurationRoot configuration)
+		public static IServiceCollection AddFareDealStaging(this IServiceCollection services, IConfiguration configuration)
 		{
 			if (services == null)
 			{

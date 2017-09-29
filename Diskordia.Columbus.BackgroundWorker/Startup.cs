@@ -1,33 +1,35 @@
-﻿using System;
-using System.IO;
-using Diskordia.Columbus.Bots;
+﻿using Diskordia.Columbus.Bots;
 using Diskordia.Columbus.Common;
-using Diskordia.Columbus.Common.Hosting;
 using Diskordia.Columbus.Staging;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Diskordia.Columbus.BackgroundWorker
 {
-	public class Startup : IStartup
+	public class Startup
 	{
+		public Startup(IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
+
+		public IConfiguration Configuration { get; }
+
+		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-			var builder = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetCurrentDirectory())
-				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-				.AddJsonFile($"appsettings.{environmentName}.json", optional: true)
-				.AddEnvironmentVariables();
-
-			var configuration = builder.Build();
-
 			services.AddOptions()
-			        .AddSerializer()
-					.AddFareDealStaging(configuration)
-					.AddFareDealBots(configuration)
-					.BuildServiceProvider();
+					.AddSerializer()
+					.AddFareDealStaging(Configuration)
+					.AddFareDealBots(Configuration);
+		}
+
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		{
+
 		}
 	}
 }

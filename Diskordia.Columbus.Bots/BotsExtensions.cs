@@ -9,7 +9,7 @@ namespace Diskordia.Columbus.Bots
 {
 	public static class BotsExtensions
 	{
-		public static IServiceCollection AddFareDealBots(this IServiceCollection services, IConfigurationRoot configuration)
+		public static IServiceCollection AddFareDealBots(this IServiceCollection services, IConfiguration configuration)
 		{
 			if(services == null)
 			{
