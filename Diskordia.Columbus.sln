@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.Backgrou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.Common", "Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj", "{8E4F346F-2674-4C4F-BF59-7AE71C093394}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.Staging", "Diskordia.Columbus.Staging\Diskordia.Columbus.Staging.csproj", "{BB32C43D-7A45-4446-B49E-54F897DD669B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.Contract", "Diskordia.Columbus.Contract\Diskordia.Columbus.Contract.csproj", "{3B38F922-A11B-425B-8F1A-4D8AE8F404E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.WebApp", "Diskordia.Columbus.WebApp\Diskordia.Columbus.WebApp.csproj", "{9C552045-DF87-4615-849B-5A32E9AC0D9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +31,17 @@ Global
 		{8E4F346F-2674-4C4F-BF59-7AE71C093394}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E4F346F-2674-4C4F-BF59-7AE71C093394}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E4F346F-2674-4C4F-BF59-7AE71C093394}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB32C43D-7A45-4446-B49E-54F897DD669B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB32C43D-7A45-4446-B49E-54F897DD669B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB32C43D-7A45-4446-B49E-54F897DD669B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB32C43D-7A45-4446-B49E-54F897DD669B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B38F922-A11B-425B-8F1A-4D8AE8F404E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B38F922-A11B-425B-8F1A-4D8AE8F404E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B38F922-A11B-425B-8F1A-4D8AE8F404E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B38F922-A11B-425B-8F1A-4D8AE8F404E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C552045-DF87-4615-849B-5A32E9AC0D9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C552045-DF87-4615-849B-5A32E9AC0D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C552045-DF87-4615-849B-5A32E9AC0D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C552045-DF87-4615-849B-5A32E9AC0D9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

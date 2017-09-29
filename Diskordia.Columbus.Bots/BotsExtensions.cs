@@ -24,7 +24,7 @@ namespace Diskordia.Columbus.Bots
 			services.AddTransient<IFareDealService, SingaporeAirlinesFareDealService>();
 			services.AddTransient<IStartable, FareDealServiceStartable>();
 
-			services.Configure<FareDealOptions>(configuration.GetSection("FareDeals"));
+			services.Configure<FareDealOptions>(configuration.GetSection("Bots:FareDeals"));
 
 			return services;
 		}

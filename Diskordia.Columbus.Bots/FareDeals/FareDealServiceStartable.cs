@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Diskordia.Columbus.Bots.FareDeals;
 using Diskordia.Columbus.Common;
+using Diskordia.Columbus.Contract.FareDeals;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Options;
 
@@ -50,38 +51,52 @@ namespace Diskordia.Columbus.Bots.FareDeals
 
 		public void Start()
 		{
-			foreach(IFareDealService service in fareDealServices)
-			{
-				try
-				{
-					IEnumerable<FareDeal> fareDeals = service.SearchFareDeals().ToArray();
+			Console.WriteLine("Starting fare deal bot.");
 
-					foreach (var fareDeal in fareDeals)
-					{
-						Console.WriteLine($"Found fare deal from {fareDeal.DepartureAirport} to {fareDeal.DestinationAirport}.");
+			StartAsync();
+		}
 
-						Console.WriteLine($"Price: {fareDeal.Price} {fareDeal.Currency}");
-						Console.WriteLine($"Class: {fareDeal.Class}");
-						Console.WriteLine($"Book by: {fareDeal.BookBy}");
-						Console.WriteLine($"Outbound travel period: {fareDeal.OutboundStartDate} to {fareDeal.OutboundEndDate}");
-						Console.WriteLine($"Travel complete date: {fareDeal.TravelCompleteDate}");
-					}
-
-					SendMessageAsync(fareDeals)
-						.GetAwaiter()
-						.GetResult();
-				}
-				catch(Exception e)
-				{
-					Console.WriteLine($"{DateTime.Now} > Exception: {e.Message}");
-				}
-			}
+		public void Stop()
+		{
 		}
 
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		private async Task StartAsync()
+		{
+			await Task.Run(() =>
+			{
+				foreach (IFareDealService service in fareDealServices)
+				{
+					try
+					{
+						IEnumerable<FareDeal> fareDeals = service.SearchFareDeals().ToArray();
+
+						foreach (var fareDeal in fareDeals)
+						{
+							Console.WriteLine($"Found fare deal from {fareDeal.DepartureAirport} to {fareDeal.DestinationAirport}.");
+
+							Console.WriteLine($"Price: {fareDeal.Price} {fareDeal.Currency}");
+							Console.WriteLine($"Class: {fareDeal.Class}");
+							Console.WriteLine($"Book by: {fareDeal.BookBy}");
+							Console.WriteLine($"Outbound travel period: {fareDeal.OutboundStartDate} to {fareDeal.OutboundEndDate}");
+							Console.WriteLine($"Travel complete date: {fareDeal.TravelCompleteDate}");
+						}
+
+						SendMessageAsync(fareDeals)
+							.GetAwaiter()
+							.GetResult();
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine($"{DateTime.Now} > Exception: {e.Message}");
+					}
+				}
+			});
 		}
 
 		private async Task SendMessageAsync(IEnumerable<FareDeal> fareDeals)

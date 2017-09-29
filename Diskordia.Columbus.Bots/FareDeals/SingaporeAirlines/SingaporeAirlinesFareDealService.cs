@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
+using Diskordia.Columbus.Contract.FareDeals;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 

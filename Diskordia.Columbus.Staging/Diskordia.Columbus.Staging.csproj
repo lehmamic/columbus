@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FareDeals\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Contract\Diskordia.Columbus.Contract.csproj" />
+  </ItemGroup>
+</Project>

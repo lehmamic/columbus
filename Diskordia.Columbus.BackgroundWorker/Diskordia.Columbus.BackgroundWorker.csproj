@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Diskordia.Columbus.Bots\Diskordia.Columbus.Bots.csproj" />
     <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Staging\Diskordia.Columbus.Staging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings*.json">

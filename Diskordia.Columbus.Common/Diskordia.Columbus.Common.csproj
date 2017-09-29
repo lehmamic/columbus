@@ -6,9 +6,13 @@
 
   <ItemGroup>
     <Compile Remove="IModule.cs" />
+    <Compile Remove="Hosting\IAppHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Hosting\" />
   </ItemGroup>
 </Project>
