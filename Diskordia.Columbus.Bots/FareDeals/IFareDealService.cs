@@ -5,6 +5,6 @@ namespace Diskordia.Columbus.Bots.FareDeals
 {
 	public interface IFareDealService
 	{
-		IEnumerable<FareDeal> SearchFareDeals();
+		IEnumerable<FareDeal> SearchFareDeals(AirlineScan target);
 	}
 }

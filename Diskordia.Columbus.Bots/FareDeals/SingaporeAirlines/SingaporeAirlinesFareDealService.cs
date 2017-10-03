@@ -13,7 +13,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 {
 	public class SingaporeAirlinesFareDealService : IFareDealService
 	{
-		public IEnumerable<FareDeal> SearchFareDeals()
+		public IEnumerable<FareDeal> SearchFareDeals(AirlineScan target)
 		{
 			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
 			{
@@ -59,6 +59,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 					{
 						yield return new FareDeal
 						{
+							Airline = Airline.SingaporeAirlines,
 							Link = new Uri(fareDeal.Link),
 							DepartureAirport = fareDealsSection.DepartureAirport,
 							DestinationAirport = fareDeal.DestinationAirport,

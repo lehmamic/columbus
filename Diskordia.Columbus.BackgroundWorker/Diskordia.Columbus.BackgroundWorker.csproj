@@ -1,23 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="HangFire.AspNetCore" Version="1.6.17" />
+    <PackageReference Include="HangFire.Core" Version="1.6.17" />
+    <PackageReference Include="HangFire.Mongo" Version="0.5.4" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="Rebus" Version="4.0.1" />
+    <PackageReference Include="Rebus.ServiceProvider" Version="4.0.0" />
+    <PackageReference Include="Rebus.RabbitMq" Version="4.0.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.32.0" />
   </ItemGroup>
-
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
-
   <ItemGroup>
-    <Compile Remove="Controllers\ValuesController.cs" />
+    <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Contract\Diskordia.Columbus.Contract.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Bots\Diskordia.Columbus.Bots.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Staging\Diskordia.Columbus.Staging.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Diskordia.Columbus.Bots\Diskordia.Columbus.Bots.csproj" />
-    <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
-    <ProjectReference Include="..\Diskordia.Columbus.Staging\Diskordia.Columbus.Staging.csproj" />
+    <Folder Include="Services\" />
   </ItemGroup>
 </Project>

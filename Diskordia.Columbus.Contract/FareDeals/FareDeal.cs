@@ -4,6 +4,8 @@ namespace Diskordia.Columbus.Contract.FareDeals
 {
 	public class FareDeal
 	{
+		public Airline Airline { get; set; }
+
 		public Uri Link { get; set; }
 
 		public string DepartureAirport { get; set; }

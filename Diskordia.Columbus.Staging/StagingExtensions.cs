@@ -20,9 +20,9 @@ namespace Diskordia.Columbus.Staging
 				throw new ArgumentNullException(nameof(configuration));
 			}
 
-			services.AddTransient<IStartable, FareDealStagingStartable>();
+			services.AddTransient<IFareDealsRepository, FareDealsRepository>();
 
-			services.Configure<FareDealStagingOptions>(configuration.GetSection("Staging:FareDeals"));
+			//services.Configure<FareDealStagingOptions>(configuration.GetSection("Staging:FareDeals"));
 
 			return services;
 		}

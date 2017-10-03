@@ -9,6 +9,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
+    <PackageReference Include="Rebus" Version="4.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,5 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
     <ProjectReference Include="..\Diskordia.Columbus.Contract\Diskordia.Columbus.Contract.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="FareDeals\FareDealStagingStartable.cs" />
   </ItemGroup>
 </Project>

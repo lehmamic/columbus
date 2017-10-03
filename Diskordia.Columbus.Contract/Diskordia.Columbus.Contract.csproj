@@ -7,4 +7,7 @@
   <ItemGroup>
     <Folder Include="FareDeals\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="FareDeals\Aireline.cs" />
+  </ItemGroup>
 </Project>
