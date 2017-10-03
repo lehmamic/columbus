@@ -1,6 +1,6 @@
 ﻿namespace Diskordia.Columbus.Contract.FareDeals
 {
-	public class AirlineScan
+	public class FareDealScan
 	{
 		public string Uri { get; set; }
 

@@ -4,25 +4,48 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
 using Diskordia.Columbus.Contract.FareDeals;
+using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 {
-	public class SingaporeAirlinesFareDealService : IFareDealService
+	public class SingaporeAirlinesFareDealService : IFareDealScanService
 	{
-		public IEnumerable<FareDeal> SearchFareDeals(AirlineScan target)
+		readonly IOptionsSnapshot<SingaporeAirlinesOptions> options;
+
+		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> options)
+		{
+			if(options == null)
+			{
+				throw new ArgumentNullException(nameof(options));
+			}
+
+			this.options = options;
+		}
+		public async Task<IEnumerable<FareDeal>> SearchFareDealsAsync(FareDealScan scan)
 		{
 			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
 			{
-				IEnumerable<FareDeal> availableFareDeals = this.SearchForAvailableFareDeals(driver);
+				IEnumerable<FareDeal> availableFareDeals = await this.SearchForAvailableFareDealsAsync(driver);
+
+				var result = new List<FareDeal>();
 				foreach (var fareDeal in availableFareDeals.ToArray())
 				{
-					yield return ReadFareDealDetails(driver, fareDeal);
+					var enrichedFareDeal = await ReadFareDealDetailsAsync(driver, fareDeal);
+					result.Add(enrichedFareDeal);
 				}
+
+				return result;
 			}
+		}
+
+		private static async Task<FareDeal> ReadFareDealDetailsAsync(ChromeDriver driver, FareDeal fareDeal)
+		{
+			return await Task.Run(() => ReadFareDealDetails(driver, fareDeal));
 		}
 
 		private static FareDeal ReadFareDealDetails(ChromeDriver driver, FareDeal fareDeal)
@@ -42,9 +65,26 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return fareDeal;
 		}
 
-		private IEnumerable<FareDeal> SearchForAvailableFareDeals(IWebDriver driver)
+		private async Task<IEnumerable<FareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver)
 		{
-			var page = new HomePage(driver, new Uri("http://www.singaporeair.com/en_UK/ch/home"));
+			var result = new List<FareDeal>();
+			foreach(var uri in this.options.Value.TargetUrls)
+			{
+				IEnumerable<FareDeal> fareDeals = (await this.SearchForAvailableFareDealsAsync(driver, uri)).ToArray();
+				result.AddRange(fareDeals);
+			}
+
+			return result;
+		}
+
+		private async Task<IEnumerable<FareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver, Uri uri)
+		{
+			return await Task.Run(() => this.SearchForAvailableFareDeals(driver, uri));
+		}
+
+		private IEnumerable<FareDeal> SearchForAvailableFareDeals(IWebDriver driver, Uri uri)
+		{
+			var page = new HomePage(driver, uri);
 			page.NavigateTo();
 
 			var fareDealsSection = page.Sections.OfType<FareDealsSectionComponent>().SingleOrDefault();

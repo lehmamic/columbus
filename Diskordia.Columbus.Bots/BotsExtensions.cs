@@ -21,9 +21,9 @@ namespace Diskordia.Columbus.Bots
 				throw new ArgumentNullException(nameof(configuration));
 			}
 
-			services.AddTransient<IFareDealService, SingaporeAirlinesFareDealService>();
+			services.AddTransient<IFareDealScanService, SingaporeAirlinesFareDealService>();
 
-			//services.Configure<FareDealOptions>(configuration.GetSection("Bots:FareDeals"));
+			services.Configure<SingaporeAirlinesOptions>(configuration.GetSection("FareDealScan:SingaporeAirlines"));
 
 			return services;
 		}

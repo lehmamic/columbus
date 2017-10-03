@@ -4,11 +4,11 @@ using Rebus.Bus;
 
 namespace Diskordia.Columbus.BackgroundWorker.Services
 {
-	public class FareDealBotsService : IFareDealBotsService
+	public class FareDealScanProxy : IFareDealScanProxy
 	{
 		readonly IBus bus;
 
-		public FareDealBotsService(IBus bus)
+		public FareDealScanProxy(IBus bus)
 		{
 			if ( bus == null)
 			{
@@ -22,9 +22,9 @@ namespace Diskordia.Columbus.BackgroundWorker.Services
 		{
 			var command = new StartFareDealsScanCommand
 			{
-				Bots = new AirlineScan[]
+				Scans = new FareDealScan[]
 				{
-					new AirlineScan { Airline = Airline.SingaporeAirlines, Uri = "http://www.singaporeair.com/en_UK/ch/home" }
+					new FareDealScan { Airline = Airline.SingaporeAirlines, Uri = "http://www.singaporeair.com/en_UK/ch/home" }
 				}
 			};
 

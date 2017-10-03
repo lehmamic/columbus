@@ -11,9 +11,9 @@ namespace Diskordia.Columbus.Bots.FareDeals
 	public class FareDealBotsHandler : IHandleMessages<StartFareDealsScanCommand>
 	{
 		readonly IBus bus;
-		readonly IEnumerable<IFareDealService> fareDealServices;
+		readonly IEnumerable<IFareDealScanService> fareDealServices;
 
-		public FareDealBotsHandler(IBus bus, IEnumerable<IFareDealService> fareDealServices)
+		public FareDealBotsHandler(IBus bus, IEnumerable<IFareDealScanService> fareDealServices)
 		{
 			if(bus == null)
 			{
@@ -31,21 +31,19 @@ namespace Diskordia.Columbus.Bots.FareDeals
 
 		public async Task Handle(StartFareDealsScanCommand message)
 		{
-			await Task.Run(() => {
-				foreach (var scan in message.Bots)
+			foreach (var scan in message.Scans)
+			{
+				foreach (var service in this.fareDealServices)
 				{
-					foreach (var service in this.fareDealServices)
+					var fareDeals = await service.SearchFareDealsAsync(scan);
+					var result = new FareDealScanResult
 					{
-						var fareDeals = service.SearchFareDeals(scan);
-						var result = new FareDealScanResult
-						{
-							FareDeals = fareDeals.ToArray()
-						};
+						FareDeals = fareDeals.ToArray()
+					};
 
-						this.bus.SendLocal(result);
-					}
+					await this.bus.SendLocal(result);
 				}
-			});
+			}
 		}
 	}
 }

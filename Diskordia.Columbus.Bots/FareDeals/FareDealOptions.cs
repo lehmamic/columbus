@@ -2,8 +2,6 @@
 {
 	public class FareDealOptions
 	{
-		public string ServiceBusConnectionString { get; set; }
-
-		public string ImportQueueName { get; set; }
+	
 	}
 }

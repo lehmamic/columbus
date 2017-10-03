@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Diskordia.Columbus.BackgroundWorker.Services
 {
-	public interface IFareDealBotsService
+	public interface IFareDealScanProxy
 	{
 		void TriggerFareDealsScan();
 	}

@@ -1,11 +1,8 @@
-﻿namespace Diskordia.Columbus.Staging.FareDeals
+﻿using Diskordia.Columbus.Common;
+
+namespace Diskordia.Columbus.Staging.FareDeals
 {
-	public class FareDealStagingOptions
+	public class FareDealStagingOptions : MongoDbOptions
 	{
-		public string ServiceBusConnectionString { get; set; }
-
-		public string ImportQueueName { get; set; }
-
-		public string ExportQueueName { get; set; }
 	}
 }

@@ -22,7 +22,7 @@ namespace Diskordia.Columbus.Staging
 
 			services.AddTransient<IFareDealsRepository, FareDealsRepository>();
 
-			//services.Configure<FareDealStagingOptions>(configuration.GetSection("Staging:FareDeals"));
+			services.Configure<FareDealStagingOptions>(configuration.GetSection("Staging:FareDeals"));
 
 			return services;
 		}

@@ -26,5 +26,6 @@
     <ItemGroup>
       <Compile Remove="BotsAutofacModule.cs" />
       <Compile Remove="FareDeals\FareDealServiceStartable.cs" />
+      <Compile Remove="FareDeals\FareDealOptions.cs" />
     </ItemGroup>
 </Project>

@@ -4,6 +4,6 @@ namespace Diskordia.Columbus.Contract.FareDeals
 {
 	public class StartFareDealsScanCommand
 	{
-		public IEnumerable<AirlineScan> Bots { get; set; }
+		public IEnumerable<FareDealScan> Scans { get; set; }
 	}
 }

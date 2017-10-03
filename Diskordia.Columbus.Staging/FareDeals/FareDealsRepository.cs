@@ -3,19 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Diskordia.Columbus.Contract.FareDeals;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace Diskordia.Columbus.Staging.FareDeals
 {
 	public class FareDealsRepository : IFareDealsRepository
 	{
-		IMongoClient client;
-		IMongoDatabase database;
+		private readonly IOptions<FareDealStagingOptions> options;
+		private readonly IMongoClient client;
+		private readonly IMongoDatabase database;
 
-		public FareDealsRepository()
+		public FareDealsRepository(IOptions<FareDealStagingOptions> options)
 		{
-			this.client = new MongoClient("mongodb://localhost");
-			this.database = this.client.GetDatabase("COLUMBUS-FAREDEALS");
+			if(options == null)
+			{
+				throw new ArgumentNullException(nameof(options));
+			}
+
+			this.options = options;
+			this.client = new MongoClient(this.options.Value.ConnectionString);
+			this.database = this.client.GetDatabase(this.options.Value.Database);
 		}
 
 		public async Task MergeFareDeals(IEnumerable<FareDeal> fareDeals)
@@ -23,7 +31,7 @@ namespace Diskordia.Columbus.Staging.FareDeals
 			if (fareDeals.Any())
 			{
 				var collection = this.database.GetCollection<FareDeal>("FareDeals");
-				await collection.DeleteManyAsync(Builders<FareDeal>.Filter.Eq("Airline", fareDeals.First().Airline));
+				await collection.DeleteManyAsync(Builders<FareDeal>.Filter.Eq(nameof(FareDeal.Airline), fareDeals.First().Airline));
 				await collection.InsertManyAsync(fareDeals);
 			}
 		}
