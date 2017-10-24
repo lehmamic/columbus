@@ -47,7 +47,7 @@ namespace Diskordia.Columbus.BackgroundWorker
 			services.AddRebus(config => config.Transport(t => t.UseRabbitMq(serviceBusOptions.ConnectionString, serviceBusOptions.QueueName)));
 
 			var hangfireOptions = this.Configuration.GetSection("HangFire").Get<MongoDbOptions>();
-			services.AddHangfire(config => config.UseMongoStorage(hangfireOptions.ConnectionString, hangfireOptions.Database));
+ 			services.AddHangfire(config => config.UseMongoStorage(hangfireOptions.ConnectionString, hangfireOptions.Database));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

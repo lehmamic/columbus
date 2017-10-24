@@ -24,6 +24,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 
 			this.driver = driver;
 			this.element = element;
+			this.FareDealCities = new CustomSelectElement(this.driver, "fare-deal-city");
 		}
 
 		public string DepartureAirport
@@ -34,14 +35,24 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			}
 		}
 
-		public IEnumerable<string> AvailableDepatureAirports
+		public string ViewAllByCityUrl
 		{
 			get
 			{
-				return this.element.FindElements(By.CssSelector("#fare-deal-city option"))
-					       .Select(e => e.GetAttribute("value"));
+				return this.element.FindElement(By.Id("viewallbycity")).GetAttribute("href");
 			}
 		}
+
+		public CustomSelectElement FareDealCities { get; }
+
+		//public IEnumerable<string> AvailableDepatureAirports
+		//{
+		//	get
+		//	{
+		//		return this.element.FindElements(By.CssSelector("#fare-deal-city option"))
+		//			       .Select(e => e.GetAttribute("value"));
+		//	}
+		//}
 
 		public IEnumerable<FareDealsListItemComponent> FareDeals
 		{
@@ -53,25 +64,25 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			}
 		}
 
-		public void SelectDepartureAirport(string airport)
-		{
-			IWebElement customSelectElement = this.element.FindElement(By.ClassName("custom-select"));
+		//public void SelectDepartureAirport(string airport)
+		//{
+		//	IWebElement customSelectElement = this.element.FindElement(By.ClassName("custom-select"));
 
-			// e.g. customSelect-19-combobox
-			string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
+		//	// e.g. customSelect-19-combobox
+		//	string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
 
-			// in this case customSelect-19-listbox
-			string optionElementId = inputOverlayId.Replace("combobox", "listbox");
+		//	// in this case customSelect-19-listbox
+		//	string optionElementId = inputOverlayId.Replace("combobox", "listbox");
 
-			customSelectElement.Click();
+		//	customSelectElement.Click();
 
-			var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
-				.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), airport, StringComparison.OrdinalIgnoreCase));
+		//	var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
+		//		.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), airport, StringComparison.OrdinalIgnoreCase));
 
-			if(optionElement !=null)
-			{
-				optionElement.Click();
-			}
-		}
+		//	if(optionElement !=null)
+		//	{
+		//		optionElement.Click();
+		//	}
+		//}
 	}
 }

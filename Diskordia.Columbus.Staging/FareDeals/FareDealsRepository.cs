@@ -30,7 +30,7 @@ namespace Diskordia.Columbus.Staging.FareDeals
 		{
 			if (fareDeals.Any())
 			{
-				var collection = this.database.GetCollection<FareDeal>("FareDeals");
+				var collection = this.database.GetCollection<FareDeal>("Staging.FareDeals");
 				await collection.DeleteManyAsync(Builders<FareDeal>.Filter.Eq(nameof(FareDeal.Airline), fareDeals.First().Airline));
 				await collection.InsertManyAsync(fareDeals);
 			}

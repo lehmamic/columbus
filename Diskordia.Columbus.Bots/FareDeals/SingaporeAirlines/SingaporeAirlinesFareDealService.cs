@@ -26,90 +26,131 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 
 			this.options = options;
 		}
+
 		public async Task<IEnumerable<FareDeal>> SearchFareDealsAsync(FareDealScan scan)
 		{
 			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
 			{
-				IEnumerable<FareDeal> availableFareDeals = await this.SearchForAvailableFareDealsAsync(driver);
-
-				var result = new List<FareDeal>();
-				foreach (var fareDeal in availableFareDeals.ToArray())
-				{
-					var enrichedFareDeal = await ReadFareDealDetailsAsync(driver, fareDeal);
-					result.Add(enrichedFareDeal);
-				}
-
-				return result;
+				return (await this.SearchForAvailableFareDealsAsync(driver))
+					.ToArray();
 			}
-		}
-
-		private static async Task<FareDeal> ReadFareDealDetailsAsync(ChromeDriver driver, FareDeal fareDeal)
-		{
-			return await Task.Run(() => ReadFareDealDetails(driver, fareDeal));
-		}
-
-		private static FareDeal ReadFareDealDetails(ChromeDriver driver, FareDeal fareDeal)
-		{
-			var page = new FareDealPage(driver, fareDeal.Link);
-			page.NavigateTo();
-
-			var outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
-								.Select(p => DateTime.Parse(p.Trim()));
-
-			fareDeal.BookBy = DateTime.Parse(page.BookBy);
-			fareDeal.OutboundStartDate = outboundTravelPeriod.ElementAt(0);
-			fareDeal.OutboundEndDate = outboundTravelPeriod.ElementAt(1);
-			fareDeal.TravelCompleteDate = DateTime.Parse(page.TravelCompleteDate);
-
-
-			return fareDeal;
 		}
 
 		private async Task<IEnumerable<FareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver)
 		{
+			IEnumerable<Uri> fareDealPages = await GetAvailableFareDealPages(driver);
+
 			var result = new List<FareDeal>();
-			foreach(var uri in this.options.Value.TargetUrls)
+			foreach(var uri in fareDealPages)
 			{
-				IEnumerable<FareDeal> fareDeals = (await this.SearchForAvailableFareDealsAsync(driver, uri)).ToArray();
-				result.AddRange(fareDeals);
+				var page = new FareDealPage(driver, uri);
+				page.NavigateTo();
+
+				var outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
+					.Select(p => DateTime.Parse(p.Trim()));
+
+				var fareDeal = new FareDeal
+				{
+					Link = uri,
+					Airline = Airline.SingaporeAirlines,
+					DepartureAirport = "",
+					DestinationAirport = "",
+					Price = 0,
+					Currency = "",
+					Class = "",
+					BookBy = DateTime.Parse(page.BookBy),
+					OutboundStartDate = outboundTravelPeriod.ElementAt(0),
+					OutboundEndDate = outboundTravelPeriod.ElementAt(1),
+					TravelCompleteDate = DateTime.Parse(page.TravelCompleteDate)
+				};
+
+				result.Add(fareDeal);
+
 			}
 
 			return result;
 		}
 
-		private async Task<IEnumerable<FareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver, Uri uri)
+		private async Task<IEnumerable<Uri>> GetAvailableFareDealPages(IWebDriver driver)
 		{
-			return await Task.Run(() => this.SearchForAvailableFareDeals(driver, uri));
+			var result = new List<Uri>();
+
+			foreach (var uri in this.options.Value.TargetUrls)
+			{
+				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri))
+					.ToArray();
+
+				IEnumerable<Uri> specialOffsersByCountryUrls = (await GetFareDealPagesByCountryAsync(driver, specialOffersByCityUrls))
+					.ToArray();
+
+				result.AddRange(specialOffsersByCountryUrls);
+			}
+
+			return result;
 		}
 
-		private IEnumerable<FareDeal> SearchForAvailableFareDeals(IWebDriver driver, Uri uri)
+		private async Task<IEnumerable<Uri>> GetFareDealPagesByCountryAsync(IWebDriver driver, IEnumerable<Uri> specialOfferByCityUrls)
 		{
-			var page = new HomePage(driver, uri);
+			var result = new List<Uri>();
+
+			foreach (Uri specialOffersByCityUrl in specialOfferByCityUrls)
+			{
+				IEnumerable<Uri> fareDealPages = (await GetFareDealPagesByCityAsync(driver, specialOffersByCityUrl))
+					.ToArray();
+
+				result.AddRange(fareDealPages);
+			}
+
+			return result;
+		}
+
+		private async Task<IEnumerable<Uri>> GetFareDealPagesByCityAsync(IWebDriver driver, Uri specialOfferUrl)
+		{
+			return await Task.Run(() => GetFareDealPagesByCity(driver, specialOfferUrl));
+		}
+
+		private IEnumerable<Uri> GetFareDealPagesByCity(IWebDriver driver, Uri specialOfferUrl)
+		{
+			var page = new SpecialOffersPage(driver, specialOfferUrl);
+			page.NavigateTo();
+
+			var result = new List<Uri>();
+
+			foreach (var preferredClass in page.PreferredClass.Options)
+			{
+				page.PreferredClass.Select(preferredClass);
+
+				var fareDealPageLinks = page.FareDealLinks.Select(l => new Uri(l));
+				result.AddRange(fareDealPageLinks);
+			}
+
+			return result;
+		}
+
+		private async Task<IEnumerable<Uri>> GetSpecialOfferPagesByCityAsync(IWebDriver driver, Uri homePageUrl)
+		{
+			return await Task.Run(() => this.GetSpecialOfferPagesByCity(driver, homePageUrl));
+		}
+
+		private IEnumerable<Uri> GetSpecialOfferPagesByCity(IWebDriver driver, Uri homePageUrl)
+		{
+			var page = new HomePage(driver, homePageUrl);
 			page.NavigateTo();
 
 			var fareDealsSection = page.Sections.OfType<FareDealsSectionComponent>().SingleOrDefault();
 
+			var result = new List<Uri>();
 			if (fareDealsSection != null)
 			{
-				foreach (string airport in fareDealsSection.AvailableDepatureAirports)
+				foreach (string airport in fareDealsSection.FareDealCities.Options)
 				{
-					fareDealsSection.SelectDepartureAirport(airport);
+					fareDealsSection.FareDealCities.Select(airport);
 
-					foreach (var fareDeal in fareDealsSection.FareDeals)
-					{
-						yield return new FareDeal
-						{
-							Airline = Airline.SingaporeAirlines,
-							Link = new Uri(fareDeal.Link),
-							DepartureAirport = fareDealsSection.DepartureAirport,
-							DestinationAirport = fareDeal.DestinationAirport,
-							Class = fareDeal.Class,
-							Currency = Regex.Match(fareDeal.PriceLabel, @"[A-Z]{3}").Value,
-							Price = Decimal.Parse(Regex.Match(fareDeal.PriceValue, @"\d+(\.\d+)?").Value)
-						};
-					}
+					result.Add(new Uri(fareDealsSection.ViewAllByCityUrl));
 				}
 			}
+
+			return result;
 		}
 	}
 }

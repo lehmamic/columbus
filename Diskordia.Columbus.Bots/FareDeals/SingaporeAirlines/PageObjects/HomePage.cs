@@ -39,7 +39,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 
 		public void NavigateTo()
 		{
-			driver.Navigate().GoToUrl(this.uri);
+			this.driver.Navigate().GoToUrl(this.uri);
 		}
 	}
 }
