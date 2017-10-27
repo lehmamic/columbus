@@ -36,61 +36,55 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		{
 			get
 			{
+				WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
 				var result = new List<string>();
 
-				try
+				IWebElement seeMoreButton = this.driver.FindElement(By.ClassName("see-more-btn"));
+				while (seeMoreButton != null && seeMoreButton.Displayed)
 				{
-					IWebElement seeMoreButton = this.driver.FindElement(By.ClassName("see-more-btn"));
-					while (seeMoreButton != null && seeMoreButton.Displayed)
-					{
-						WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
-						wait.Until(ExpectedConditions.ElementToBeClickable(seeMoreButton));
+					wait.Until(ExpectedConditions.ElementToBeClickable(seeMoreButton));
+					seeMoreButton.Click();
 
-						seeMoreButton.Click();
-
-						seeMoreButton = this.driver.FindElement(By.ClassName("see-more-btn"));
-					}
-				}
-				catch(WebDriverTimeoutException)
-				{
-					// just swallow
+					seeMoreButton = this.driver.FindElement(By.ClassName("see-more-btn"));
 				}
 
 				IEnumerable<IWebElement> promotionItemElements = this.driver.FindElements(By.ClassName("promotion-item"));
 				foreach(IWebElement promotionItemElement in promotionItemElements)
 				{
 					IWebElement promotionItemContentElement = promotionItemElement.FindElement(By.ClassName("flight-item"));
-					if(promotionItemContentElement != null)
-					{
-						Actions actions = new Actions(driver);
+					IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+					executor.ExecuteScript("arguments[0].click()", promotionItemContentElement);
+					//Actions actions = new Actions(driver);
 
-						actions.MoveToElement(promotionItemContentElement)
-						       .Click()
-						       .Perform();
+					//actions.MoveToElement(promotionItemContentElement)
+					//.Click()
+					//.Perform();
 
 
-						//promotionItemContentElement.Click();
-						WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
-						wait.Until(d => promotionItemElement.FindElement(By.ClassName("promotion-item__detail")));
+					//promotionItemContentElement.Click();
 
-						IEnumerable<string> links = promotionItemElement.FindElements(By.ClassName("btn-1"))
-																		.Where(e => string.Equals(e.Text, "Book Now", StringComparison.OrdinalIgnoreCase))
-																		.Select(e => e.GetAttribute("href"))
-																		.ToArray();
+					//IWebElement promotionItemDetailElement = promotionItemElement.FindElement(By.ClassName("promotion-item__detail"));
+					//wait.Until(ExpectedConditions.(promotionItemDetailElement));
 
-						result.AddRange(links);
-					}
+					IEnumerable<string> links = promotionItemElement.FindElements(By.ClassName("btn-1"))
+																	.Where(e => string.Equals(e.Text, "Book Now", StringComparison.OrdinalIgnoreCase))
+																	.Select(e => e.GetAttribute("href"))
+																	.ToArray();
+
+					result.AddRange(links);
 				}
 
 				return result;
-						   
-
 			}	
 		}
+
 
 		public void NavigateTo()
 		{
 			this.driver.Navigate().GoToUrl(this.uri);
+
+			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
+			wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("overlay-loading")));
 		}
 	}
 }

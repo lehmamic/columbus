@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using Polly;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
@@ -39,10 +40,26 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 
 		public void Select(string value)
 		{
-			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
-
 			IEnumerable<IWebElement> allCustomSelectElements = this.driver.FindElements(By.ClassName("custom-select"));
 			IWebElement customSelectElement = allCustomSelectElements.FirstOrDefault(e => IsCustomSelectWithId(e, this.id));
+
+			Policy.Handle<WebDriverException>()
+			      .Or<InvalidOperationException>() // can happen when the notifications popup is there
+				  .WaitAndRetry(2, retryAttempt => TimeSpan.FromSeconds(2))
+			      .Execute(() =>
+					{
+						this.ClickOption(customSelectElement, value);
+					});
+		}
+
+		private static bool IsCustomSelectWithId(IWebElement element, string id)
+		{
+			return element.FindElements(By.Id(id)).Any();
+		}
+
+		private void ClickOption(IWebElement customSelectElement, string value)
+		{
+			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
 
 			// e.g. customSelect-19-combobox
 			string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
@@ -58,15 +75,10 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 
 			if (optionElement != null)
 			{
-				
+
 				wait.Until(ExpectedConditions.ElementToBeClickable(optionElement));
 				optionElement.Click();
 			}
-		}
-
-		private static bool IsCustomSelectWithId(IWebElement element, string id)
-		{
-			return element.FindElements(By.Id(id)).Any();
 		}
 	}
 }

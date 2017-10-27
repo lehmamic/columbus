@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -46,18 +47,24 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 				var page = new FareDealPage(driver, uri);
 				page.NavigateTo();
 
-				var outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
+				Match airportsMatch = Regex.Match(page.Title, @"^[^()]+\((?<from>[A-Z]{3})\)[^()]+\((?<to>[A-Z]{3})\)$");
+
+				Match priceMatch = Regex.Match(page.Price, @"^From\s(?<currency>[A-Z]{3})\s(?<amount>\d+(,\d+)?)$");
+
+				Match classMatch = Regex.Match(page.Info, @"");
+
+				IEnumerable<DateTime> outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
 					.Select(p => DateTime.Parse(p.Trim()));
 
 				var fareDeal = new FareDeal
 				{
 					Link = uri,
 					Airline = Airline.SingaporeAirlines,
-					DepartureAirport = "",
-					DestinationAirport = "",
-					Price = 0,
-					Currency = "",
-					Class = "",
+					DepartureAirport = airportsMatch.Success ? airportsMatch.Groups["from"].Value : string.Empty,
+					DestinationAirport = airportsMatch.Success ? airportsMatch.Groups["to"].Value : string.Empty,
+					Price = priceMatch.Success ? decimal.Parse(priceMatch.Groups["amount"].Value, NumberStyles.AllowThousands) : 0m,
+					Currency = priceMatch.Success ? priceMatch.Groups["currency"].Value : string.Empty,
+					Class = classMatch.Success ? classMatch.Groups["class"].Value.Trim() : string.Empty,
 					BookBy = DateTime.Parse(page.BookBy),
 					OutboundStartDate = outboundTravelPeriod.ElementAt(0),
 					OutboundEndDate = outboundTravelPeriod.ElementAt(1),
@@ -77,7 +84,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 
 			foreach (var uri in this.options.Value.TargetUrls)
 			{
-				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri))
+				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri, this.options.Value.TargetUrls.First() == uri))
 					.ToArray();
 
 				IEnumerable<Uri> specialOffsersByCountryUrls = (await GetFareDealPagesByCountryAsync(driver, specialOffersByCityUrls))
@@ -127,15 +134,21 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return result;
 		}
 
-		private async Task<IEnumerable<Uri>> GetSpecialOfferPagesByCityAsync(IWebDriver driver, Uri homePageUrl)
+		private async Task<IEnumerable<Uri>> GetSpecialOfferPagesByCityAsync(IWebDriver driver, Uri homePageUrl, bool closeInitialPopups)
 		{
-			return await Task.Run(() => this.GetSpecialOfferPagesByCity(driver, homePageUrl));
+			return await Task.Run(() => this.GetSpecialOfferPagesByCity(driver, homePageUrl, closeInitialPopups));
 		}
 
-		private IEnumerable<Uri> GetSpecialOfferPagesByCity(IWebDriver driver, Uri homePageUrl)
+		private IEnumerable<Uri> GetSpecialOfferPagesByCity(IWebDriver driver, Uri homePageUrl, bool closeInitialPopups)
 		{
 			var page = new HomePage(driver, homePageUrl);
 			page.NavigateTo();
+
+			if(closeInitialPopups)
+			{
+				page.DeclineNotifications();
+				page.CloseCookiePopup();
+			}
 
 			var fareDealsSection = page.Sections.OfType<FareDealsSectionComponent>().SingleOrDefault();
 
