@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using Polly;
 
@@ -60,6 +61,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		private void ClickOption(IWebElement customSelectElement, string value)
 		{
 			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
+			Actions actions = new Actions(driver);
 
 			// e.g. customSelect-19-combobox
 			string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
@@ -67,17 +69,16 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			// in this case customSelect-19-listbox
 			string optionElementId = inputOverlayId.Replace("combobox", "listbox");
 
-			wait.Until(ExpectedConditions.ElementToBeClickable(customSelectElement));
-			customSelectElement.Click();
+			actions.MoveToElement(customSelectElement);
+			actions.Perform();
 
 			var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
 				.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), value, StringComparison.OrdinalIgnoreCase));
 
 			if (optionElement != null)
 			{
-
-				wait.Until(ExpectedConditions.ElementToBeClickable(optionElement));
-				optionElement.Click();
+				actions.MoveToElement(optionElement);
+				actions.Perform();
 			}
 		}
 	}

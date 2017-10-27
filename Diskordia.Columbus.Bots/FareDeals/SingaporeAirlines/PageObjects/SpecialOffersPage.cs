@@ -52,15 +52,21 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				foreach(IWebElement promotionItemElement in promotionItemElements)
 				{
 					IWebElement promotionItemContentElement = promotionItemElement.FindElement(By.ClassName("flight-item"));
-					IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
-					executor.ExecuteScript("arguments[0].click()", promotionItemContentElement);
+
+					Actions actions = new Actions(driver);
+					actions.MoveToElement(promotionItemContentElement);
+					actions.Click();
+					actions.Perform();
+
+					//IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+					//executor.ExecuteScript("arguments[0].click()", promotionItemContentElement);
 					//Actions actions = new Actions(driver);
 
 					//actions.MoveToElement(promotionItemContentElement)
 					//.Click()
 					//.Perform();
 
-
+					//wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemContentElement));
 					//promotionItemContentElement.Click();
 
 					//IWebElement promotionItemDetailElement = promotionItemElement.FindElement(By.ClassName("promotion-item__detail"));
@@ -72,6 +78,16 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 																	.ToArray();
 
 					result.AddRange(links);
+
+					IWebElement closePromotionItemButton = promotionItemElement.FindElement(By.ClassName("close-btn"));
+					//wait.Until(ExpectedConditions.ElementToBeClickable(closePromotionItemButton));
+					//closePromotionItemButton.Click();
+					//actions.MoveToElement(closePromotionItemButton);
+					//actions.Click();
+					//actions.Perform();
+
+					//wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemContentElement));
+					//promotionItemContentElement.Click();
 				}
 
 				return result;

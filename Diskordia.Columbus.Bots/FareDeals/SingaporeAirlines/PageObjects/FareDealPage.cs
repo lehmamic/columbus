@@ -39,7 +39,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		{
 			get
 			{
-				IWebElement element = this.driver.FindElements(By.ClassName("info-promotions span"))
+				IWebElement element = this.driver.FindElements(By.CssSelector(".info-promotions span"))
 					       .FirstOrDefault(e => Regex.IsMatch(e.Text, "Round Trip"));
 
 				string info = string.Empty;
