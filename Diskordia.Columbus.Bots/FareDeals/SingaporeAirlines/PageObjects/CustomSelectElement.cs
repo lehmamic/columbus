@@ -69,8 +69,10 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			// in this case customSelect-19-listbox
 			string optionElementId = inputOverlayId.Replace("combobox", "listbox");
 
-			actions.MoveToElement(customSelectElement);
-			actions.Perform();
+			IJavaScriptExecutor executor = (IJavaScriptExecutor)this.driver;
+			executor.ExecuteScript("arguments[0].click();", customSelectElement);
+
+			this.driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(1));
 
 			var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
 				.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), value, StringComparison.OrdinalIgnoreCase));
