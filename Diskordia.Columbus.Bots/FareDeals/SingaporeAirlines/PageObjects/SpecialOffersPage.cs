@@ -4,6 +4,7 @@ using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using Polly;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
@@ -37,6 +38,8 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			get
 			{
 				WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
+
+
 				var result = new List<string>();
 
 				IWebElement seeMoreButton = this.driver.FindElement(By.ClassName("see-more-btn"));
@@ -49,49 +52,53 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				}
 
 				IEnumerable<IWebElement> promotionItemElements = this.driver.FindElements(By.ClassName("promotion-item"));
-				foreach(IWebElement promotionItemElement in promotionItemElements)
+				foreach (IWebElement promotionItemElement in promotionItemElements)
 				{
-					IWebElement promotionItemContentElement = promotionItemElement.FindElement(By.ClassName("flight-item"));
+					wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemElement));
 
-					Actions actions = new Actions(driver);
-					actions.MoveToElement(promotionItemContentElement);
-					actions.Click();
-					actions.Perform();
-
-					//IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
-					//executor.ExecuteScript("arguments[0].click()", promotionItemContentElement);
-					//Actions actions = new Actions(driver);
-
-					//actions.MoveToElement(promotionItemContentElement)
-					//.Click()
-					//.Perform();
-
-					//wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemContentElement));
-					//promotionItemContentElement.Click();
-
-					//IWebElement promotionItemDetailElement = promotionItemElement.FindElement(By.ClassName("promotion-item__detail"));
-					//wait.Until(ExpectedConditions.(promotionItemDetailElement));
-
-					IEnumerable<string> links = promotionItemElement.FindElements(By.ClassName("btn-1"))
-																	.Where(e => string.Equals(e.Text, "Book Now", StringComparison.OrdinalIgnoreCase))
-																	.Select(e => e.GetAttribute("href"))
-																	.ToArray();
-
+					IEnumerable<string> links = Policy.Handle<WebDriverException>()
+					                                  .WaitAndRetry(2, retryCount => TimeSpan.FromSeconds(1))
+					                                  .Execute(() => ReadFareDealUrlsFromPromotionItem(promotionItemElement)) ;
 					result.AddRange(links);
 
-					IWebElement closePromotionItemButton = promotionItemElement.FindElement(By.ClassName("close-btn"));
-					//wait.Until(ExpectedConditions.ElementToBeClickable(closePromotionItemButton));
-					//closePromotionItemButton.Click();
-					//actions.MoveToElement(closePromotionItemButton);
-					//actions.Click();
-					//actions.Perform();
-
-					//wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemContentElement));
-					//promotionItemContentElement.Click();
 				}
 
 				return result;
-			}	
+			}
+		}
+
+		private IEnumerable<string> ReadFareDealUrlsFromPromotionItem(IWebElement promotionItemElement)
+		{
+			IWebElement detailElement = promotionItemElement.FindElements(By.ClassName("promotion-item__detail"))
+			                                                .FirstOrDefault();
+			if (detailElement == null || !detailElement.Displayed)
+			{
+				IWebElement promotionItemContentElement = promotionItemElement.FindElement(By.ClassName("flight-item"));
+
+				IJavaScriptExecutor executor = (IJavaScriptExecutor)this.driver;
+				executor.ExecuteScript("arguments[0].click();", promotionItemContentElement);
+
+				this.driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(1));
+			}
+			//Actions actions = new Actions(driver);
+			//actions.MoveToElement(promotionItemContentElement);
+			//actions.Click();
+			//actions.Perform();
+
+			//actions.MoveToElement(promotionItemContentElement)
+			//.Click()
+			//.Perform();
+
+			//wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemContentElement));
+			//promotionItemContentElement.Click();
+
+			//IWebElement promotionItemDetailElement = promotionItemElement.FindElement(By.ClassName("promotion-item__detail"));
+			//wait.Until(ExpectedConditions.(promotionItemDetailElement));
+
+			return promotionItemElement.FindElements(By.ClassName("btn-1"))
+															.Where(e => string.Equals(e.Text, "Book Now", StringComparison.OrdinalIgnoreCase))
+															.Select(e => e.GetAttribute("href"))
+															.ToArray();
 		}
 
 

@@ -6,6 +6,6 @@ namespace Diskordia.Columbus.Staging.FareDeals
 {
 	public interface IFareDealsRepository
 	{
-		Task MergeFareDeals(IEnumerable<FareDeal> fareDeals);
+		Task MergeFareDeals(IEnumerable<SingaporeAirlinesFareDeal> fareDeals);
 	}
 }

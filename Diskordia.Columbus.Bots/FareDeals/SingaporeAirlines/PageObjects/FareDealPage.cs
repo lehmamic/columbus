@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
@@ -108,6 +109,24 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			}
 		}
 
+		public string OutboundStartDate
+		{
+			get
+			{
+				IWebElement element = this.driver.FindElement(By.Id("outboundStartDate"));
+				return element.Text;
+			}
+		}
+
+		public string OutboundEndDate
+		{
+			get
+			{
+				IWebElement element = this.driver.FindElement(By.Id("outboundEndDate"));
+				return element.Text;
+			}
+		}
+
 		public string TravelCompleteDate
 		{
 			get
@@ -128,6 +147,9 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		public void NavigateTo()
 		{
 			this.driver.Navigate().GoToUrl(this.uri);
+
+			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
+			wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("overlay-loading")));
 		}
 	}
 }

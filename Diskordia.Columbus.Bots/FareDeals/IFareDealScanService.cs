@@ -6,6 +6,6 @@ namespace Diskordia.Columbus.Bots.FareDeals
 {
 	public interface IFareDealScanService
 	{
-		Task<IEnumerable<FareDeal>> SearchFareDealsAsync(FareDealScan scan);
+		Task<IEnumerable<SingaporeAirlinesFareDeal>> SearchFareDealsAsync();
 	}
 }

@@ -5,7 +5,7 @@ using Rebus.Handlers;
 
 namespace Diskordia.Columbus.Staging.FareDeals
 {
-	public class FareDealScanResultHandler : IHandleMessages<FareDealScanResult>
+	public class FareDealScanResultHandler : IHandleMessages<FareDealScanResult<SingaporeAirlinesFareDeal>>
 	{
 		readonly IFareDealsRepository repository;
 
@@ -19,7 +19,7 @@ namespace Diskordia.Columbus.Staging.FareDeals
 			this.repository = repository;
 		}
 
-		public async Task Handle(FareDealScanResult message)
+		public async Task Handle(FareDealScanResult<SingaporeAirlinesFareDeal> message)
 		{
 			await this.repository.MergeFareDeals(message.FareDeals);
 		}

@@ -26,12 +26,13 @@ namespace Diskordia.Columbus.Staging.FareDeals
 			this.database = this.client.GetDatabase(this.options.Value.Database);
 		}
 
-		public async Task MergeFareDeals(IEnumerable<FareDeal> fareDeals)
+		public async Task MergeFareDeals(IEnumerable<SingaporeAirlinesFareDeal> fareDeals)
 		{
+			var collection = this.database.GetCollection<SingaporeAirlinesFareDeal>("Staging.FareDeals.SingaporeAirlines");
+			await collection.DeleteManyAsync(Builders<SingaporeAirlinesFareDeal>.Filter.Empty);
+
 			if (fareDeals.Any())
 			{
-				var collection = this.database.GetCollection<FareDeal>("Staging.FareDeals");
-				await collection.DeleteManyAsync(Builders<FareDeal>.Filter.Eq(nameof(FareDeal.Airline), fareDeals.First().Airline));
 				await collection.InsertManyAsync(fareDeals);
 			}
 		}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Diskordia.Columbus.Contract.FareDeals;
+using Microsoft.Extensions.Logging;
 using Rebus.Bus;
 using Rebus.Handlers;
 
@@ -10,14 +11,20 @@ namespace Diskordia.Columbus.Bots.FareDeals
 {
 	public class FareDealBotsHandler : IHandleMessages<StartFareDealsScanCommand>
 	{
-		readonly IBus bus;
-		readonly IEnumerable<IFareDealScanService> fareDealServices;
+		private readonly IBus bus;
+		private readonly ILogger logger;
+		private readonly IEnumerable<IFareDealScanService> fareDealServices;
 
-		public FareDealBotsHandler(IBus bus, IEnumerable<IFareDealScanService> fareDealServices)
+		public FareDealBotsHandler(IBus bus, ILogger<FareDealBotsHandler> logger, IEnumerable<IFareDealScanService> fareDealServices)
 		{
-			if(bus == null)
+			if (bus == null)
 			{
 				throw new ArgumentNullException(nameof(bus));
+			}
+
+			if (logger == null)
+			{
+				throw new ArgumentNullException(nameof(logger));
 			}
 
 			if (fareDealServices == null)
@@ -26,23 +33,24 @@ namespace Diskordia.Columbus.Bots.FareDeals
 			}
 
 			this.bus = bus;
+			this.logger = logger;
 			this.fareDealServices = fareDealServices;
 		}
 
 		public async Task Handle(StartFareDealsScanCommand message)
 		{
-			foreach (var scan in message.Scans)
+			foreach (var service in this.fareDealServices)
 			{
-				foreach (var service in this.fareDealServices)
+				logger.LogInformation("Start to scan singapore airlines for fare deals.");
+				var fareDeals = await service.SearchFareDealsAsync();
+				var result = new FareDealScanResult<SingaporeAirlinesFareDeal>
 				{
-					var fareDeals = await service.SearchFareDealsAsync(scan);
-					var result = new FareDealScanResult
-					{
-						FareDeals = fareDeals.ToArray()
-					};
+					FareDeals = fareDeals.ToArray()
+				};
 
-					await this.bus.SendLocal(result);
-				}
+				logger.LogInformation("Singapore airlines fare deal scan completed, sending result to service bus.");
+
+				await this.bus.SendLocal(result);
 			}
 		}
 	}

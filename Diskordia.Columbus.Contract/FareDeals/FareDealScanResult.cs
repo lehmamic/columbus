@@ -2,8 +2,8 @@
 
 namespace Diskordia.Columbus.Contract.FareDeals
 {
-	public class FareDealScanResult
+	public class FareDealScanResult<TResult>
 	{
-		public IEnumerable<FareDeal> FareDeals { get; set; }
+		public IEnumerable<TResult> FareDeals { get; set; }
 	}
 }

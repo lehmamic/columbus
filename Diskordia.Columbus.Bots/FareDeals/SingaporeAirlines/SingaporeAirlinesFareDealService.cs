@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
 using Diskordia.Columbus.Contract.FareDeals;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -16,63 +15,56 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 {
 	public class SingaporeAirlinesFareDealService : IFareDealScanService
 	{
-		readonly IOptionsSnapshot<SingaporeAirlinesOptions> options;
+		private readonly IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions;
+		private readonly IOptionsSnapshot<FareDealScanOptions> fareDealoptions;
+		private readonly ILogger logger;
 
-		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> options)
+		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions, IOptionsSnapshot<FareDealScanOptions> fareDealoptions, ILogger<SingaporeAirlinesFareDealService> logger)
 		{
-			if(options == null)
+			if (singaporeAirlinesOptions == null)
 			{
-				throw new ArgumentNullException(nameof(options));
+				throw new ArgumentNullException(nameof(singaporeAirlinesOptions));
 			}
 
-			this.options = options;
+			if (fareDealoptions == null)
+			{
+				throw new ArgumentNullException(nameof(fareDealoptions));
+			}
+
+			if (logger == null)
+			{
+				throw new ArgumentNullException(nameof(logger));
+			}
+
+			this.singaporeAirlinesOptions = singaporeAirlinesOptions;
+			this.logger = logger;
 		}
 
-		public async Task<IEnumerable<FareDeal>> SearchFareDealsAsync(FareDealScan scan)
+		public async Task<IEnumerable<SingaporeAirlinesFareDeal>> SearchFareDealsAsync()
 		{
-			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
+			ChromeOptions options = new ChromeOptions();
+
+			if (this.fareDealoptions.Value.HeadlessMode)
+			{
+				options.AddArgument("--headless");
+			}
+
+			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options))
 			{
 				return (await this.SearchForAvailableFareDealsAsync(driver))
 					.ToArray();
 			}
 		}
 
-		private async Task<IEnumerable<FareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver)
+		private async Task<IEnumerable<SingaporeAirlinesFareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver)
 		{
 			IEnumerable<Uri> fareDealPages = await GetAvailableFareDealPages(driver);
 
-			var result = new List<FareDeal>();
-			foreach(var uri in fareDealPages)
+			var result = new List<SingaporeAirlinesFareDeal>();
+			foreach(var uri in fareDealPages.Distinct().ToArray())
 			{
-				var page = new FareDealPage(driver, uri);
-				page.NavigateTo();
-
-				Match airportsMatch = Regex.Match(page.Title, @"^[^()]+\((?<from>[A-Z]{3})\)[^()]+\((?<to>[A-Z]{3})\)$");
-
-				Match priceMatch = Regex.Match(page.Price, @"^From\s(?<currency>[A-Z]{3})\s(?<amount>\d+(,\d+)?)$");
-
-				Match classMatch = Regex.Match(page.Info, @"");
-
-				IEnumerable<DateTime> outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
-					.Select(p => DateTime.Parse(p.Trim()));
-
-				var fareDeal = new FareDeal
-				{
-					Link = uri,
-					Airline = Airline.SingaporeAirlines,
-					DepartureAirport = airportsMatch.Success ? airportsMatch.Groups["from"].Value : string.Empty,
-					DestinationAirport = airportsMatch.Success ? airportsMatch.Groups["to"].Value : string.Empty,
-					Price = priceMatch.Success ? decimal.Parse(priceMatch.Groups["amount"].Value, NumberStyles.AllowThousands) : 0m,
-					Currency = priceMatch.Success ? priceMatch.Groups["currency"].Value : string.Empty,
-					Class = classMatch.Success ? classMatch.Groups["class"].Value.Trim() : string.Empty,
-					BookBy = DateTime.Parse(page.BookBy),
-					OutboundStartDate = outboundTravelPeriod.ElementAt(0),
-					OutboundEndDate = outboundTravelPeriod.ElementAt(1),
-					TravelCompleteDate = DateTime.Parse(page.TravelCompleteDate)
-				};
-
+				SingaporeAirlinesFareDeal fareDeal = await this.ExtractFareDealFromPageAsync(driver, uri);
 				result.Add(fareDeal);
-
 			}
 
 			return result;
@@ -82,9 +74,11 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 		{
 			var result = new List<Uri>();
 
-			foreach (var uri in this.options.Value.TargetUrls)
+			foreach (var uri in this.singaporeAirlinesOptions.Value.TargetUrls)
 			{
-				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri, this.options.Value.TargetUrls.First() == uri))
+				logger.LogTrace("Scanning url {0} for special offer pages.", uri);
+
+				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri, this.singaporeAirlinesOptions.Value.TargetUrls.First() == uri))
 					.ToArray();
 
 				IEnumerable<Uri> specialOffsersByCountryUrls = (await GetFareDealPagesByCountryAsync(driver, specialOffersByCityUrls))
@@ -125,9 +119,14 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 
 			foreach (var preferredClass in page.PreferredClass.Options)
 			{
+				logger.LogTrace("Scanning special offer page from url {0} for class {1}", specialOfferUrl, preferredClass);
 				page.PreferredClass.Select(preferredClass);
 
-				var fareDealPageLinks = page.FareDealLinks.Select(l => new Uri(l));
+				var fareDealPageLinks = page.FareDealLinks.Select(l =>
+				{
+					logger.LogDebug("Fare deal url found {0} for class {1}", l, preferredClass);
+					return new Uri(l);
+				});
 				result.AddRange(fareDealPageLinks);
 			}
 
@@ -159,11 +158,62 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 				{
 					fareDealsSection.FareDealCities.Select(airport);
 
-					result.Add(new Uri(fareDealsSection.ViewAllByCityUrl));
+					string url = fareDealsSection.ViewAllByCityUrl;
+					this.logger.LogDebug("Found special offer pages {0}.", url);
+					
+					result.Add(new Uri(url));
 				}
 			}
 
 			return result;
+		}
+
+		private async Task<SingaporeAirlinesFareDeal> ExtractFareDealFromPageAsync(IWebDriver driver, Uri url)
+		{
+			return await Task.Run(() => this.ExtractFareDealFromPage(driver, url));
+		}
+
+		private SingaporeAirlinesFareDeal ExtractFareDealFromPage(IWebDriver driver, Uri url)
+		{
+			logger.LogInformation("Scanning fare deal from url {0}", url);
+
+			var page = new FareDealPage(driver, url);
+			page.NavigateTo();
+
+			//Match airportsMatch = Regex.Match(page.Title, @"^[^()]+\((?<from>[A-Z]{3})\)[^()]+\((?<to>[A-Z]{3})\)$");
+
+			//Match priceMatch = Regex.Match(page.Price, @"^From\s(?<currency>[A-Z]{3})\s(?<amount>\d+(,\d+)?)$");
+
+			//Match classMatch = Regex.Match(page.Info, @"");
+
+			//IEnumerable<DateTime> outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
+			//	.Select(p => DateTime.Parse(p.Trim()));
+
+			//var fareDeal = new SingaporeAirlinesFareDeal
+			//{
+			//	Link = uri,
+			//	Airline = Airline.SingaporeAirlines,
+			//	DepartureAirport = airportsMatch.Success ? airportsMatch.Groups["from"].Value : string.Empty,
+			//	DestinationAirport = airportsMatch.Success ? airportsMatch.Groups["to"].Value : string.Empty,
+			//	Price = priceMatch.Success ? decimal.Parse(priceMatch.Groups["amount"].Value, NumberStyles.AllowThousands) : 0m,
+			//	Currency = priceMatch.Success ? priceMatch.Groups["currency"].Value : string.Empty,
+			//	Class = classMatch.Success ? classMatch.Groups["class"].Value.Trim() : string.Empty,
+			//	BookBy = DateTime.Parse(page.BookBy),
+			//	OutboundStartDate = outboundTravelPeriod.ElementAt(0),
+			//	OutboundEndDate = outboundTravelPeriod.ElementAt(1),
+			//	TravelCompleteDate = DateTime.Parse(page.TravelCompleteDate)
+			//};
+			return new SingaporeAirlinesFareDeal
+			{
+				Link = url,
+				Titel = page.Title,
+				TravelInfo = page.Info,
+				Price = page.Price,
+				BookBy = page.BookBy,
+				OutboundStartDate = page.OutboundStartDate,
+				OutboundEndDate = page.OutboundEndDate,
+				TravelCompleteDate = page.TravelCompleteDate,
+			};
 		}
 	}
 }
