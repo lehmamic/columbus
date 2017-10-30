@@ -16,19 +16,19 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 	public class SingaporeAirlinesFareDealService : IFareDealScanService
 	{
 		private readonly IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions;
-		private readonly IOptionsSnapshot<FareDealScanOptions> fareDealoptions;
+		private readonly IOptionsSnapshot<FareDealScanOptions> fareDealOptions;
 		private readonly ILogger logger;
 
-		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions, IOptionsSnapshot<FareDealScanOptions> fareDealoptions, ILogger<SingaporeAirlinesFareDealService> logger)
+		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions, IOptionsSnapshot<FareDealScanOptions> fareDealOptions, ILogger<SingaporeAirlinesFareDealService> logger)
 		{
 			if (singaporeAirlinesOptions == null)
 			{
 				throw new ArgumentNullException(nameof(singaporeAirlinesOptions));
 			}
 
-			if (fareDealoptions == null)
+			if (fareDealOptions == null)
 			{
-				throw new ArgumentNullException(nameof(fareDealoptions));
+				throw new ArgumentNullException(nameof(fareDealOptions));
 			}
 
 			if (logger == null)
@@ -37,6 +37,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			}
 
 			this.singaporeAirlinesOptions = singaporeAirlinesOptions;
+			this.fareDealOptions = fareDealOptions;
 			this.logger = logger;
 		}
 
@@ -44,7 +45,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 		{
 			ChromeOptions options = new ChromeOptions();
 
-			if (this.fareDealoptions.Value.HeadlessMode)
+			if (this.fareDealOptions.Value.HeadlessMode)
 			{
 				options.AddArgument("--headless");
 			}
