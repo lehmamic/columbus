@@ -62,10 +62,10 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				string price = string.Empty;
 				if(element != null)
 				{
-					string currency = element.FindElement(By.CssSelector("span")).Text;
-					string amount = element.Text;
+					//string currency = element.FindElement(By.CssSelector("span")).Text;
+					price = element.Text;
 
-					price = $"{currency}{amount}";
+					//price = $"{currency}{amount}";
 				}
 
 				return price;
@@ -114,7 +114,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			get
 			{
 				IWebElement element = this.driver.FindElement(By.Id("outboundStartDate"));
-				return element.Text;
+				return element.GetAttribute("innerHTML");
 			}
 		}
 
@@ -123,7 +123,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			get
 			{
 				IWebElement element = this.driver.FindElement(By.Id("outboundEndDate"));
-				return element.Text;
+				return element.GetAttribute("innerHTML");
 			}
 		}
 
