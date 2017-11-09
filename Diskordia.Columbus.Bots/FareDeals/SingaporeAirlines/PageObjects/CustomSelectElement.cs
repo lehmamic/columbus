@@ -61,7 +61,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		private void ClickOption(IWebElement customSelectElement, string value)
 		{
 			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 5));
-			Actions actions = new Actions(driver);
+			//Actions actions = new Actions(driver);
 
 			// e.g. customSelect-19-combobox
 			string inputOverlayId = customSelectElement.FindElement(By.ClassName("input-overlay")).GetAttribute("id");
@@ -72,15 +72,14 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			IJavaScriptExecutor executor = (IJavaScriptExecutor)this.driver;
 			executor.ExecuteScript("arguments[0].click();", customSelectElement);
 
-			this.driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(1));
+			this.driver.Wait(TimeSpan.FromSeconds(1));
 
 			var optionElement = this.driver.FindElements(By.CssSelector($"#{optionElementId} li"))
 				.FirstOrDefault(e => string.Equals(e.GetAttribute("data-value"), value, StringComparison.OrdinalIgnoreCase));
 
 			if (optionElement != null)
 			{
-				actions.MoveToElement(optionElement);
-				actions.Perform();
+				executor.ExecuteScript("arguments[0].click();", optionElement);
 			}
 		}
 	}

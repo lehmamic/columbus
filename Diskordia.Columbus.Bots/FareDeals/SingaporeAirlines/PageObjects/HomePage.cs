@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
@@ -41,30 +40,6 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		public void NavigateTo()
 		{
 			this.driver.Navigate().GoToUrl(this.uri);
-		}
-
-		public void DeclineNotifications()
-		{
-			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
-			wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("insider-opt-in-disallow-button")));
-
-			IWebElement notificatinsDeclineButton = this.driver.FindElement(By.ClassName("insider-opt-in-disallow-button"));
-			if (notificatinsDeclineButton != null && notificatinsDeclineButton.Displayed)
-			{
-				notificatinsDeclineButton.Click();
-			}
-		}
-
-		public void CloseCookiePopup()
-		{
-			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
-			wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".popup--cookie a")));
-
-			IWebElement closePopupButton = this.driver.FindElement(By.CssSelector(".popup--cookie a"));
-			if (closePopupButton != null && closePopupButton.Displayed)
-			{
-				closePopupButton.Click();
-			}
 		}
 	}
 }

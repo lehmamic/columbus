@@ -39,18 +39,26 @@ namespace Diskordia.Columbus.Bots.FareDeals
 
 		public async Task Handle(StartFareDealsScanCommand message)
 		{
-			foreach (var service in this.fareDealServices)
+			try
 			{
-				logger.LogInformation("Start to scan singapore airlines for fare deals.");
-				var fareDeals = await service.SearchFareDealsAsync();
-				var result = new FareDealScanResult<SingaporeAirlinesFareDeal>
+				foreach (var service in this.fareDealServices)
 				{
-					FareDeals = fareDeals.ToArray()
-				};
+					logger.LogInformation("Start to scan singapore airlines for fare deals.");
+					var fareDeals = service.SearchFareDeals();
+					var result = new FareDealScanResult<SingaporeAirlinesFareDeal>
+					{
+						FareDeals = fareDeals.ToArray()
+					};
 
-				logger.LogInformation("Singapore airlines fare deal scan completed, sending result to service bus.");
+					logger.LogInformation("Singapore airlines fare deal scan completed, sending result to service bus.");
 
-				await this.bus.SendLocal(result);
+					await this.bus.SendLocal(result);
+				}
+			}
+			catch (Exception e)
+			{
+				this.logger.LogError("The Singapre airlines fare deal scan failed", e);
+				throw;
 			}
 		}
 	}

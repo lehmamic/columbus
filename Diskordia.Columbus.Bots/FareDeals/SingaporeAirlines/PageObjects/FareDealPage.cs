@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 {
@@ -114,7 +113,11 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			get
 			{
 				IWebElement element = this.driver.FindElement(By.Id("outboundStartDate"));
-				return element.GetAttribute("innerHTML");
+
+				IJavaScriptExecutor js = (IJavaScriptExecutor)this.driver;
+				js.ExecuteScript("arguments[0].setAttribute('type', '')", element);
+
+				return element.GetAttribute("value");
 			}
 		}
 
@@ -123,7 +126,11 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 			get
 			{
 				IWebElement element = this.driver.FindElement(By.Id("outboundEndDate"));
-				return element.GetAttribute("innerHTML");
+
+				IJavaScriptExecutor js = (IJavaScriptExecutor)this.driver;
+				js.ExecuteScript("arguments[0].setAttribute('type', '')", element);
+
+				return element.GetAttribute("value");
 			}
 		}
 
@@ -147,9 +154,8 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		public void NavigateTo()
 		{
 			this.driver.Navigate().GoToUrl(this.uri);
-
-			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
-			wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("overlay-loading")));
+			this.driver.WaitUntilLoadingOverlayClosed();
+			this.driver.Wait(TimeSpan.FromSeconds(1));
 		}
 	}
 }

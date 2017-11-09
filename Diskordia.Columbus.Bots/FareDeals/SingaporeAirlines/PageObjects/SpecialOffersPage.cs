@@ -54,7 +54,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				IEnumerable<IWebElement> promotionItemElements = this.driver.FindElements(By.ClassName("promotion-item"));
 				foreach (IWebElement promotionItemElement in promotionItemElements)
 				{
-					wait.Until(ExpectedConditions.ElementToBeClickable(promotionItemElement));
+					this.driver.Wait(TimeSpan.FromSeconds(1));
 
 					IEnumerable<string> links = Policy.Handle<WebDriverException>()
 					                                  .WaitAndRetry(2, retryCount => TimeSpan.FromSeconds(1))
@@ -78,7 +78,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				IJavaScriptExecutor executor = (IJavaScriptExecutor)this.driver;
 				executor.ExecuteScript("arguments[0].click();", promotionItemContentElement);
 
-				this.driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(1));
+				this.driver.Wait(TimeSpan.FromSeconds(1));
 			}
 			//Actions actions = new Actions(driver);
 			//actions.MoveToElement(promotionItemContentElement);
@@ -105,9 +105,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 		public void NavigateTo()
 		{
 			this.driver.Navigate().GoToUrl(this.uri);
-
-			WebDriverWait wait = new WebDriverWait(driver, new TimeSpan(0, 0, 10));
-			wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("overlay-loading")));
+			this.driver.WaitUntilLoadingOverlayClosed();
 		}
 	}
 }

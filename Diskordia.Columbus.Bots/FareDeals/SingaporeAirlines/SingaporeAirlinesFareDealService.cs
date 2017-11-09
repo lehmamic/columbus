@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
 using Diskordia.Columbus.Contract.FareDeals;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using Polly;
+using Polly.Timeout;
 
 namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 {
@@ -41,37 +42,38 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			this.logger = logger;
 		}
 
-		public async Task<IEnumerable<SingaporeAirlinesFareDeal>> SearchFareDealsAsync()
+		public IEnumerable<SingaporeAirlinesFareDeal> SearchFareDeals()
 		{
 			ChromeOptions options = new ChromeOptions();
-
 			if (this.fareDealOptions.Value.HeadlessMode)
 			{
 				options.AddArgument("--headless");
 			}
 
+			IEnumerable<Uri> fareDealPages;
 			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options))
 			{
-				return (await this.SearchForAvailableFareDealsAsync(driver))
-					.ToArray();
+				fareDealPages = GetAvailableFareDealPages(driver);
 			}
-		}
-
-		private async Task<IEnumerable<SingaporeAirlinesFareDeal>> SearchForAvailableFareDealsAsync(IWebDriver driver)
-		{
-			IEnumerable<Uri> fareDealPages = await GetAvailableFareDealPages(driver);
 
 			var result = new List<SingaporeAirlinesFareDeal>();
-			foreach(var uri in fareDealPages.Distinct().ToArray())
+			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options))
 			{
-				SingaporeAirlinesFareDeal fareDeal = await this.ExtractFareDealFromPageAsync(driver, uri);
-				result.Add(fareDeal);
+				foreach (var uri in fareDealPages.Distinct().ToArray())
+				{
+					SingaporeAirlinesFareDeal fareDeal = Policy.Wrap(
+						Policy.Handle<WebDriverException>().Or<InvalidOperationException>().Or<TimeoutRejectedException>().WaitAndRetry(2, retryAttempts => TimeSpan.FromSeconds(1)),
+						Policy.Timeout(TimeSpan.FromSeconds(20))
+					).Execute(() => this.ExtractFareDealFromPage(driver, uri));
+
+					result.Add(fareDeal);
+				}
 			}
 
 			return result;
 		}
 
-		private async Task<IEnumerable<Uri>> GetAvailableFareDealPages(IWebDriver driver)
+		private IEnumerable<Uri> GetAvailableFareDealPages(IWebDriver driver)
 		{
 			var result = new List<Uri>();
 
@@ -79,10 +81,10 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			{
 				logger.LogTrace("Scanning url {0} for special offer pages.", uri);
 
-				IEnumerable<Uri> specialOffersByCityUrls = (await GetSpecialOfferPagesByCityAsync(driver, uri, this.singaporeAirlinesOptions.Value.TargetUrls.First() == uri))
+				IEnumerable<Uri> specialOffersByCityUrls = GetSpecialOfferPagesByCity(driver, uri, this.singaporeAirlinesOptions.Value.TargetUrls.First() == uri)
 					.ToArray();
 
-				IEnumerable<Uri> specialOffsersByCountryUrls = (await GetFareDealPagesByCountryAsync(driver, specialOffersByCityUrls))
+				IEnumerable<Uri> specialOffsersByCountryUrls = GetFareDealPagesByCountry(driver, specialOffersByCityUrls)
 					.ToArray();
 
 				result.AddRange(specialOffsersByCountryUrls);
@@ -91,14 +93,17 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return result;
 		}
 
-		private async Task<IEnumerable<Uri>> GetFareDealPagesByCountryAsync(IWebDriver driver, IEnumerable<Uri> specialOfferByCityUrls)
+		private IEnumerable<Uri> GetFareDealPagesByCountry(IWebDriver driver, IEnumerable<Uri> specialOfferByCityUrls)
 		{
 			var result = new List<Uri>();
 
 			foreach (Uri specialOffersByCityUrl in specialOfferByCityUrls)
 			{
-				IEnumerable<Uri> fareDealPages = (await GetFareDealPagesByCityAsync(driver, specialOffersByCityUrl))
-					.ToArray();
+				IEnumerable<Uri> fareDealPages = Policy.Wrap(
+						Policy.Handle<WebDriverException>().Or<InvalidOperationException>().Or<TimeoutRejectedException>().WaitAndRetry(2, retryAttempts => TimeSpan.FromSeconds(1)),
+						Policy.Timeout(TimeSpan.FromMinutes(10))
+				).Execute(() => GetFareDealPagesByCity(driver, specialOffersByCityUrl))
+				 .ToArray();
 
 				result.AddRange(fareDealPages);
 			}
@@ -106,15 +111,13 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return result;
 		}
 
-		private async Task<IEnumerable<Uri>> GetFareDealPagesByCityAsync(IWebDriver driver, Uri specialOfferUrl)
-		{
-			return await Task.Run(() => GetFareDealPagesByCity(driver, specialOfferUrl));
-		}
-
 		private IEnumerable<Uri> GetFareDealPagesByCity(IWebDriver driver, Uri specialOfferUrl)
 		{
 			var page = new SpecialOffersPage(driver, specialOfferUrl);
 			page.NavigateTo();
+
+			driver.DeclineNotifications();
+			driver.CloseCookiePopup();
 
 			var result = new List<Uri>();
 
@@ -134,21 +137,13 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return result;
 		}
 
-		private async Task<IEnumerable<Uri>> GetSpecialOfferPagesByCityAsync(IWebDriver driver, Uri homePageUrl, bool closeInitialPopups)
-		{
-			return await Task.Run(() => this.GetSpecialOfferPagesByCity(driver, homePageUrl, closeInitialPopups));
-		}
-
 		private IEnumerable<Uri> GetSpecialOfferPagesByCity(IWebDriver driver, Uri homePageUrl, bool closeInitialPopups)
 		{
 			var page = new HomePage(driver, homePageUrl);
 			page.NavigateTo();
 
-			if(closeInitialPopups)
-			{
-				page.DeclineNotifications();
-				page.CloseCookiePopup();
-			}
+			driver.DeclineNotifications();
+			driver.CloseCookiePopup();
 
 			var fareDealsSection = page.Sections.OfType<FareDealsSectionComponent>().SingleOrDefault();
 
@@ -169,17 +164,15 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			return result;
 		}
 
-		private async Task<SingaporeAirlinesFareDeal> ExtractFareDealFromPageAsync(IWebDriver driver, Uri url)
-		{
-			return await Task.Run(() => this.ExtractFareDealFromPage(driver, url));
-		}
-
 		private SingaporeAirlinesFareDeal ExtractFareDealFromPage(IWebDriver driver, Uri url)
 		{
 			logger.LogInformation("Scanning fare deal from url {0}", url);
 
 			var page = new FareDealPage(driver, url);
 			page.NavigateTo();
+
+			driver.DeclineNotifications();
+			driver.CloseCookiePopup();
 
 			//Match airportsMatch = Regex.Match(page.Title, @"^[^()]+\((?<from>[A-Z]{3})\)[^()]+\((?<to>[A-Z]{3})\)$");
 
@@ -190,20 +183,6 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			//IEnumerable<DateTime> outboundTravelPeriod = Regex.Split(page.OutboundTravelPeriod, "to")
 			//	.Select(p => DateTime.Parse(p.Trim()));
 
-			//var fareDeal = new SingaporeAirlinesFareDeal
-			//{
-			//	Link = uri,
-			//	Airline = Airline.SingaporeAirlines,
-			//	DepartureAirport = airportsMatch.Success ? airportsMatch.Groups["from"].Value : string.Empty,
-			//	DestinationAirport = airportsMatch.Success ? airportsMatch.Groups["to"].Value : string.Empty,
-			//	Price = priceMatch.Success ? decimal.Parse(priceMatch.Groups["amount"].Value, NumberStyles.AllowThousands) : 0m,
-			//	Currency = priceMatch.Success ? priceMatch.Groups["currency"].Value : string.Empty,
-			//	Class = classMatch.Success ? classMatch.Groups["class"].Value.Trim() : string.Empty,
-			//	BookBy = DateTime.Parse(page.BookBy),
-			//	OutboundStartDate = outboundTravelPeriod.ElementAt(0),
-			//	OutboundEndDate = outboundTravelPeriod.ElementAt(1),
-			//	TravelCompleteDate = DateTime.Parse(page.TravelCompleteDate)
-			//};
 			return new SingaporeAirlinesFareDeal
 			{
 				Link = url,
