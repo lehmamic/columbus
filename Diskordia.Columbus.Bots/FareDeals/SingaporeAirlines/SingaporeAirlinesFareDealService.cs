@@ -57,13 +57,14 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			}
 
 			var result = new List<SingaporeAirlinesFareDeal>();
-			using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options))
+
+			foreach (var uri in fareDealPages.Distinct().ToArray())
 			{
-				foreach (var uri in fareDealPages.Distinct().ToArray())
+				using (var driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options))
 				{
 					SingaporeAirlinesFareDeal fareDeal = Policy.Wrap(
 						Policy.Handle<WebDriverException>().Or<InvalidOperationException>().Or<TimeoutRejectedException>().WaitAndRetry(2, retryAttempts => TimeSpan.FromSeconds(1)),
-						Policy.Timeout(TimeSpan.FromSeconds(20))
+						Policy.Timeout(TimeSpan.FromSeconds(20), TimeoutStrategy.Pessimistic)
 					).Execute(() => this.ExtractFareDealFromPage(driver, uri));
 
 					result.Add(fareDeal);
@@ -101,7 +102,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 			{
 				IEnumerable<Uri> fareDealPages = Policy.Wrap(
 						Policy.Handle<WebDriverException>().Or<InvalidOperationException>().Or<TimeoutRejectedException>().WaitAndRetry(2, retryAttempts => TimeSpan.FromSeconds(1)),
-						Policy.Timeout(TimeSpan.FromMinutes(10))
+					Policy.Timeout(TimeSpan.FromMinutes(10), TimeoutStrategy.Pessimistic)
 				).Execute(() => GetFareDealPagesByCity(driver, specialOffersByCityUrl))
 				 .ToArray();
 
