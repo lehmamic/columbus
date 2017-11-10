@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Diskordia.Columbus.Contract.FareDeals;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -26,10 +25,10 @@ namespace Diskordia.Columbus.Staging.FareDeals
 			this.database = this.client.GetDatabase(this.options.Value.Database);
 		}
 
-		public async Task MergeFareDeals(IEnumerable<SingaporeAirlinesFareDeal> fareDeals)
+		public async Task MergeFareDeals(IEnumerable<SingaporeAirlinesFareDealEntity> fareDeals)
 		{
-			var collection = this.database.GetCollection<SingaporeAirlinesFareDeal>("Staging.FareDeals.SingaporeAirlines");
-			await collection.DeleteManyAsync(Builders<SingaporeAirlinesFareDeal>.Filter.Empty);
+			var collection = this.database.GetCollection<SingaporeAirlinesFareDealEntity>("Staging.FareDeals.SingaporeAirlines");
+			await collection.DeleteManyAsync(Builders<SingaporeAirlinesFareDealEntity>.Filter.Empty);
 
 			if (fareDeals.Any())
 			{

@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoMapper;
 using Diskordia.Columbus.BackgroundWorker.Services;
 using Diskordia.Columbus.Bots;
 using Diskordia.Columbus.Bots.FareDeals;
@@ -34,6 +35,12 @@ namespace Diskordia.Columbus.BackgroundWorker
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddOptions();
+
+			services.AddAutoMapper(opt => opt.AddProfiles(
+				new []
+				{
+					typeof(StagingExtensions).Assembly
+				}));
 
 			services.AddFareDealStaging(Configuration);
 			services.AddFareDealBots(Configuration);
