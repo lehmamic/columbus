@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
@@ -76,7 +77,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
 				throw new ArgumentNullException(nameof(driver));
 			}
 
-			driver.Manage().Timeouts().ImplicitlyWait(waitTime);
+			Thread.Sleep(TimeSpan.FromSeconds(1));
 		}
 	}
 }

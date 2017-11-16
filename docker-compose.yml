@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  diskordia.columbus.backgroundworker:
+    image: diskordia.columbus.backgroundworker
+    build:
+      context: ./Diskordia.Columbus.BackgroundWorker
+      dockerfile: Dockerfile

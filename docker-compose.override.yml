@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  diskordia.columbus.backgroundworker:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ServiceBus__ConnectionString=amqp://guest:guest@docker.for.mac.localhost
+      - ServiceBus__QueueName=COLUMBUS_TEST
+      - HangFire__ConnectionString=mongodb://docker.for.mac.localhost
+      - HangFire__Database=COLUMBUS_TEST
+      - Staging__FareDeals__ConnectionString=mongodb://docker.for.mac.localhost
+      - Staging__FareDeals__Database=COLUMBUS_TEST
+    ports:
+      - "80"

@@ -54,7 +54,10 @@ namespace Diskordia.Columbus.BackgroundWorker
 			services.AddRebus(config => config.Transport(t => t.UseRabbitMq(serviceBusOptions.ConnectionString, serviceBusOptions.QueueName)));
 
 			var hangfireOptions = this.Configuration.GetSection("HangFire").Get<MongoDbOptions>();
-			services.AddHangfire(config => config.UseMongoStorage(hangfireOptions.ConnectionString, hangfireOptions.Database));
+			services.AddHangfire(config =>
+			{
+				config.UseMongoStorage(hangfireOptions.ConnectionString, hangfireOptions.Database);
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,7 +66,10 @@ namespace Diskordia.Columbus.BackgroundWorker
 			app.UseRebus();
 
 			app.UseHangfireServer();
-			app.UseHangfireDashboard();
+			app.UseHangfireDashboard(options: new DashboardOptions
+			{
+				Authorization = new [] { new DisableHangfireDashboardAuthorizationFilter() }
+			});
 
 			var fareDealScanOptions = this.Configuration.GetSection("FareDealScan").Get<FareDealScanOptions>();
 			var fareDealsBotsProxy = app.ApplicationServices.GetService<IFareDealScanProxy>();
