@@ -42,10 +42,8 @@ before_install:
   # before doing the update.
   - docker-compose --version
 
+script:
   # Setup your application stack. You may need to tweak these commands if you
   # doing out-of-the-ordinary docker-compose builds.
   - docker-compose -f docker-compose.ci.build.yml up
   - docker-compose build
-
-script:
-  - dotnet restore

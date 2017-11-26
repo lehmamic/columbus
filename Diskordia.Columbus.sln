@@ -13,10 +13,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diskordia.Columbus.Backgrou
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{20FCA7E9-7DE6-44CF-A239-39C728AA08D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = ".build", "build\.build.csproj", "{3AEC33C3-B6BE-4F26-A798-1FD94EBC5752}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F1DE47BD-09E8-47D0-B744-AD3836A468A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -49,5 +55,7 @@ Global
 		{20FCA7E9-7DE6-44CF-A239-39C728AA08D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20FCA7E9-7DE6-44CF-A239-39C728AA08D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20FCA7E9-7DE6-44CF-A239-39C728AA08D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AEC33C3-B6BE-4F26-A798-1FD94EBC5752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AEC33C3-B6BE-4F26-A798-1FD94EBC5752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 EndGlobal
