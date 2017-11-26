@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.PhantomJS;
 using Polly;
 using Polly.Timeout;
 
@@ -202,13 +203,13 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 
 		private IWebDriver CreateWebDriver()
 		{
-			ChromeOptions options = new ChromeOptions();
+			string driverDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			if (this.fareDealOptions.Value.HeadlessMode)
 			{
-				options.AddArgument("--headless");
+				return new PhantomJSDriver(driverDirectory);
 			}
 
-			return new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options);
+			return new ChromeDriver(driverDirectory);
 		}
 	}
 }

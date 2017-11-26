@@ -10,5 +10,7 @@ services:
       - HangFire__Database=COLUMBUS_TEST
       - Staging__FareDeals__ConnectionString=mongodb://docker.for.mac.localhost
       - Staging__FareDeals__Database=COLUMBUS_TEST
+      - FareDealScan__HeadlessMode=true
     ports:
       - "80"
+    privileged: true
