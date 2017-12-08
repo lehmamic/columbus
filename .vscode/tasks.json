@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/Diskordia.Columbus.Bots.Host/Diskordia.Columbus.Bots.Host.csproj"
+                "${workspaceRoot}/Diskordia.Columbus.BackgroundWorker/Diskordia.Columbus.BackgroundWorker.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"

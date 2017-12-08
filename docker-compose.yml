@@ -2,7 +2,16 @@ version: '3'
 
 services:
   diskordia.columbus.backgroundworker:
-    image: diskordia.columbus.backgroundworker
+    image: columbus.azurecr.io/diskordia.columbus.backgroundworker
     build:
       context: ./Diskordia.Columbus.BackgroundWorker
       dockerfile: Dockerfile
+    depends_on:
+      - nosql.data
+      - rabbitmq
+
+  nosql.data:
+    image: mongo
+
+  rabbitmq:
+    image: rabbitmq:3-management

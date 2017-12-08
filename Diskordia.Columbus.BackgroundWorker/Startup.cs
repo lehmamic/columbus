@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using Rebus.Config;
 using Rebus.ServiceProvider;
 
@@ -63,13 +64,19 @@ namespace Diskordia.Columbus.BackgroundWorker
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			app.UseRebus();
+			var policy = Policy.Handle<Exception>()
+																 .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+ 
+			policy.Execute(() => app.UseRebus());
 
-			app.UseHangfireServer();
-			app.UseHangfireDashboard(options: new DashboardOptions
-			{
-				Authorization = new [] { new DisableHangfireDashboardAuthorizationFilter() }
-			});
+      policy.Execute(() =>
+      {
+			  app.UseHangfireServer();
+			  app.UseHangfireDashboard(options: new DashboardOptions
+        {
+          Authorization = new [] { new DisableHangfireDashboardAuthorizationFilter() }
+        });
+      });
 
 			var fareDealScanOptions = this.Configuration.GetSection("FareDealScan").Get<FareDealScanOptions>();
 			var fareDealsBotsProxy = app.ApplicationServices.GetService<IFareDealScanProxy>();

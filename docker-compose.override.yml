@@ -4,13 +4,22 @@ services:
   diskordia.columbus.backgroundworker:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ServiceBus__ConnectionString=amqp://guest:guest@docker.for.mac.localhost
+      - ServiceBus__ConnectionString=amqp://guest:guest@rabbitmq
       - ServiceBus__QueueName=COLUMBUS_TEST
-      - HangFire__ConnectionString=mongodb://docker.for.mac.localhost
+      - HangFire__ConnectionString=mongodb://nosql.data
       - HangFire__Database=COLUMBUS_TEST
-      - Staging__FareDeals__ConnectionString=mongodb://docker.for.mac.localhost
+      - Staging__FareDeals__ConnectionString=mongodb://nosql.data
       - Staging__FareDeals__Database=COLUMBUS_TEST
       - FareDealScan__HeadlessMode=true
     ports:
-      - "80"
+      - "5001:80"
     privileged: true
+
+  nosql.data:
+    ports:
+      - "27017:27017"
+
+  rabbitmq:
+    ports:
+      - "15672:15672"
+      - "5672:5672"
