@@ -82,7 +82,6 @@ namespace Diskordia.Columbus.BackgroundWorker
 			var fareDealsBotsProxy = app.ApplicationServices.GetService<IFareDealScanProxy>();
 
 			RecurringJob.AddOrUpdate("Trigger-FareDealsScan", () => fareDealsBotsProxy.TriggerFareDealsScan(), fareDealScanOptions.ScheduleCronExpression);
-			// RecurringJob.Trigger("Trigger-FareDealsScan");
 		}
 	}
 }
