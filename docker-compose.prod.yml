@@ -5,12 +5,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ServiceBus__ConnectionString=amqp://guest:guest@rabbitmq
-      - ServiceBus__QueueName=COLUMBUS_TEST
-      - HangFire__ConnectionString=mongodb://nosql.data
+      - ServiceBus__ConnectionString=amqp:${SERVICE_BUS_CONNECTION_STRING}
+      - ServiceBus__QueueName=COLUMBUS
+      - HangFire__ConnectionString=${NOSQL_CONNECTION_STRING}
       - HangFire__Database=COLUMBUS_TEST
-      - Staging__FareDeals__ConnectionString=mongodb://nosql.data
-      - Staging__FareDeals__Database=COLUMBUS_TEST
+      - Staging__FareDeals__ConnectionString=${NOSQL_CONNECTION_STRING}
+      - Staging__FareDeals__Database=COLUMBUS
       - FareDealScan__HeadlessMode=true
     ports:
       - "5001:80"
