@@ -47,3 +47,9 @@ script:
   # doing out-of-the-ordinary docker-compose builds.
   - docker-compose -f docker-compose.ci.build.yml up
   - docker-compose build
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_REGISTRY_LOGIN" -p "$DOCKER_REGISTRY_PASSWORD" columbus.azurecr.io;
+    docker-compose push;
+    fi
