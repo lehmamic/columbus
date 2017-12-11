@@ -11,6 +11,7 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_29d1eb53d9a9_key -iv $encrypted_29d1eb53d9a9_iv -in acs_swarm_rsa.enc -out acs_swarm_rsa -d
   - sudo apt-get update
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - sudo apt-get install sshpass
   - docker --version
   - docker-compose --version
   - sudo rm /usr/local/bin/docker-compose
@@ -21,11 +22,26 @@ before_install:
 script:
   - docker-compose -f docker-compose.ci.build.yml up
   - docker-compose build
+addons:
+  ssh_known_hosts: columnbusmgmt.westeurope.cloudapp.azure.com
+
+before_deploy:
+  - openssl aes-256-cbc -K $encrypted_29d1eb53d9a9_key -iv $encrypted_29d1eb53d9a9_iv -in acs_swarm_rsa.enc -out /tmp/acs_swarm_rsa -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 /tmp/acs_swarm_rsa
+
 deploy:
   - provider: script
     skip_cleanup: true
     script:
       docker login -u "$DOCKER_REGISTRY_LOGIN" -p "$DOCKER_REGISTRY_PASSWORD" columbus.azurecr.io;
       docker-compose push;
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script:
+      sshpass -e ssh -p 2200 leh@columnbusmgmt.westeurope.cloudapp.azure.com -i /tmp/acs_swarm_rsa -v;
+      docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d;
     on:
       branch: master

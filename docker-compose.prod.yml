@@ -1,11 +1,16 @@
 version: '3'
 
+# Set ASPNETCORE_ENVIRONMENT= Development or Production, depending if you want to show up errors while testing. 
+#
+# You need to start it with the following CLI command:
+# docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
 services:
   diskordia.columbus.backgroundworker:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ServiceBus__ConnectionString=amqp:${SERVICE_BUS_CONNECTION_STRING}
+      - ServiceBus__ConnectionString=${SERVICE_BUS_CONNECTION_STRING}
       - ServiceBus__QueueName=COLUMBUS
       - HangFire__ConnectionString=${NOSQL_CONNECTION_STRING}
       - HangFire__Database=COLUMBUS_TEST
