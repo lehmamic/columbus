@@ -41,7 +41,7 @@ deploy:
   - provider: script
     skip_cleanup: true
     script:
-      sshpass -e ssh -p 2200 -fNL 2375:localhost:2374:/var/run/docker.sock leh@columnbusmgmt.westeurope.cloudapp.azure.com -i /tmp/acs_swarm_rsa -v;
+      sshpass -e ssh -p 2200 -fNL 2374:localhost:2374:/var/run/docker.sock leh@columnbusmgmt.westeurope.cloudapp.azure.com -i /tmp/acs_swarm_rsa -v;
       export DOCKER_HOST=:2374;
       docker-compose down;
       docker-compose pull;
