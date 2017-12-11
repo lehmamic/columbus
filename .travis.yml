@@ -41,7 +41,6 @@ deploy:
   - provider: script
     skip_cleanup: true
     script:
-      sshpass -e ssh -p 2200 leh@columnbusmgmt.westeurope.cloudapp.azure.com -i /tmp/acs_swarm_rsa -v;
-      docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d;
+      sshpass -e ssh -p 2200 leh@columnbusmgmt.westeurope.cloudapp.azure.com -i /tmp/acs_swarm_rsa -v docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d;
     on:
       branch: master
