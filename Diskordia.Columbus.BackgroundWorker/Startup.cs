@@ -4,6 +4,7 @@ using Diskordia.Columbus.BackgroundWorker.Services;
 using Diskordia.Columbus.Bots;
 using Diskordia.Columbus.Bots.FareDeals;
 using Diskordia.Columbus.Common;
+using Diskordia.Columbus.Contract.FareDeals;
 using Diskordia.Columbus.Staging;
 using Diskordia.Columbus.Staging.FareDeals;
 using Hangfire;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Rebus.Config;
+using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
 
 namespace Diskordia.Columbus.BackgroundWorker
@@ -52,7 +54,10 @@ namespace Diskordia.Columbus.BackgroundWorker
 			services.AutoRegisterHandlersFromAssemblyOf<FareDealScanResultHandler>();
 
 			var serviceBusOptions = this.Configuration.GetSection("ServiceBus").Get<ServiceBusOptions>();
-			services.AddRebus(config => config.Transport(t => t.UseRabbitMq(serviceBusOptions.ConnectionString, serviceBusOptions.QueueName)));
+			services.AddRebus(config => config.Transport(t => t.UseRabbitMq(serviceBusOptions.ConnectionString, serviceBusOptions.QueueName))
+			                                  .Routing(r => r.TypeBased()
+                                                                .Map<StartFareDealsScanCommand>("Diskordia.Columbus.FareDealScanner")
+                                                                .Map<FareDealScanResult<SingaporeAirlinesFareDeal>>("Diskordia.Columbus.Staging")));
 
 			var hangfireOptions = this.Configuration.GetSection("HangFire").Get<MongoDbOptions>();
 			services.AddHangfire(config =>
