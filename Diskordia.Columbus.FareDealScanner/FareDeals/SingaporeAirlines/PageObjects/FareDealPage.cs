@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 
-namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines.PageObjects
 {
 	public class FareDealPage
 	{

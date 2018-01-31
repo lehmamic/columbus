@@ -1,4 +1,4 @@
-﻿namespace Diskordia.Columbus.Bots.FareDeals
+﻿namespace Diskordia.Columbus.BackgroundWorker
 {
 	public class FareDealScanOptions
 	{

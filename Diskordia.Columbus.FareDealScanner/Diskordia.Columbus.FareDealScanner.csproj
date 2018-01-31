@@ -6,15 +6,33 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="FareDeals\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Selenium.WebDriver.PhantomJS.CrossPlatform" Version="2.1.1" />
+    <PackageReference Include="Rebus" Version="4.2.1" />
+    <PackageReference Include="Rebus.ServiceProvider" Version="4.0.1" />
+    <PackageReference Include="Rebus.RabbitMq" Version="4.2.0" />
+    <PackageReference Include="Polly" Version="5.7.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="2.35.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.2.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.8.0" />
+    <PackageReference Include="Selenium.Support" Version="3.8.0" />
+    <PackageReference Include="System.Security.Permissions" Version="4.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Controllers\ValuesController.cs" />
+    <Compile Remove="FareDealScannerOptions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diskordia.Columbus.Contract\Diskordia.Columbus.Contract.csproj" />
+    <ProjectReference Include="..\Diskordia.Columbus.Common\Diskordia.Columbus.Common.csproj" />
+  </ItemGroup>
 </Project>

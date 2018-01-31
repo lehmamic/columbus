@@ -6,7 +6,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using Polly;
 
-namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines.PageObjects
 {
 	public class SpecialOffersPage
 	{

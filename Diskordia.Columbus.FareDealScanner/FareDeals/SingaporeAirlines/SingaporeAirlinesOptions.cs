@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
+namespace Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines
 {
 	public class SingaporeAirlinesOptions
 	{

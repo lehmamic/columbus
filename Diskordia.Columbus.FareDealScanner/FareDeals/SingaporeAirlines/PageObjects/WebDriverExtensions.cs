@@ -4,7 +4,7 @@ using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects
+namespace Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines.PageObjects
 {
 	public static class WebDriverExtensions
 	{

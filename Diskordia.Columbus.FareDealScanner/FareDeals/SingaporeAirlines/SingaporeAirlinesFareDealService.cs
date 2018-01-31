@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines.PageObjects;
+using Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines.PageObjects;
 using Diskordia.Columbus.Contract.FareDeals;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,24 +13,18 @@ using OpenQA.Selenium.PhantomJS;
 using Polly;
 using Polly.Timeout;
 
-namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
+namespace Diskordia.Columbus.FareDealScanner.FareDeals.SingaporeAirlines
 {
 	public class SingaporeAirlinesFareDealService : IFareDealScanService
 	{
-		private readonly IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions;
-		private readonly IOptionsSnapshot<FareDealScanOptions> fareDealOptions;
+        private readonly IOptionsSnapshot<Options> scannerOptions;
 		private readonly ILogger logger;
 
-		public SingaporeAirlinesFareDealService(IOptionsSnapshot<SingaporeAirlinesOptions> singaporeAirlinesOptions, IOptionsSnapshot<FareDealScanOptions> fareDealOptions, ILogger<SingaporeAirlinesFareDealService> logger)
+        public SingaporeAirlinesFareDealService(IOptionsSnapshot<Options> scannerOptions, ILogger<SingaporeAirlinesFareDealService> logger)
 		{
-			if (singaporeAirlinesOptions == null)
+			if (scannerOptions == null)
 			{
-				throw new ArgumentNullException(nameof(singaporeAirlinesOptions));
-			}
-
-			if (fareDealOptions == null)
-			{
-				throw new ArgumentNullException(nameof(fareDealOptions));
+				throw new ArgumentNullException(nameof(scannerOptions));
 			}
 
 			if (logger == null)
@@ -38,8 +32,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 				throw new ArgumentNullException(nameof(logger));
 			}
 
-			this.singaporeAirlinesOptions = singaporeAirlinesOptions;
-			this.fareDealOptions = fareDealOptions;
+			this.scannerOptions = scannerOptions;
 			this.logger = logger;
 		}
 
@@ -54,7 +47,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 		{
 			var result = new List<Uri>();
 
-			foreach (var uri in this.singaporeAirlinesOptions.Value.TargetUrls)
+            foreach (var uri in this.scannerOptions.Value.SingaporeAirlines.TargetUrls)
 			{
 				logger.LogInformation("Scanning url {0} for special offer pages.", uri);
 
@@ -204,7 +197,7 @@ namespace Diskordia.Columbus.Bots.FareDeals.SingaporeAirlines
 		private IWebDriver CreateWebDriver()
 		{
 			string driverDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-			if (this.fareDealOptions.Value.HeadlessMode)
+			if (this.scannerOptions.Value.HeadlessMode)
 			{
 				return new PhantomJSDriver(driverDirectory);
 			}

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Rebus.Bus;
 using Rebus.Handlers;
 
-namespace Diskordia.Columbus.Bots.FareDeals
+namespace Diskordia.Columbus.FareDealScanner.FareDeals
 {
 	public class FareDealBotsHandler : IHandleMessages<StartFareDealsScanCommand>
 	{

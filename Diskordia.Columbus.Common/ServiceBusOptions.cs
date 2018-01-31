@@ -1,4 +1,4 @@
-﻿namespace Diskordia.Columbus.BackgroundWorker
+﻿namespace Diskordia.Columbus.Common
 {
 	public class ServiceBusOptions
 	{

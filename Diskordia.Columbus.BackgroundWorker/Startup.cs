@@ -1,8 +1,6 @@
 ﻿using System;
 using AutoMapper;
 using Diskordia.Columbus.BackgroundWorker.Services;
-using Diskordia.Columbus.Bots;
-using Diskordia.Columbus.Bots.FareDeals;
 using Diskordia.Columbus.Common;
 using Diskordia.Columbus.Contract.FareDeals;
 using Diskordia.Columbus.Staging;
@@ -46,11 +44,11 @@ namespace Diskordia.Columbus.BackgroundWorker
 				}));
 
 			services.AddFareDealStaging(Configuration);
-			services.AddFareDealBots(Configuration);
+			
 
 			services.AddSingleton<IFareDealScanProxy, FareDealScanProxy>();
 
-			services.AutoRegisterHandlersFromAssemblyOf<FareDealBotsHandler>();
+			
 			services.AutoRegisterHandlersFromAssemblyOf<FareDealScanResultHandler>();
 
 			var serviceBusOptions = this.Configuration.GetSection("ServiceBus").Get<ServiceBusOptions>();
@@ -69,24 +67,24 @@ namespace Diskordia.Columbus.BackgroundWorker
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			var policy = Policy.Handle<Exception>()
-																 .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+            var policy = Policy.Handle<Exception>()
+                               .WaitAndRetry(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
  
-			policy.Execute(() => app.UseRebus());
+            policy.Execute(() => app.UseRebus());
 
-      policy.Execute(() =>
-      {
-			  app.UseHangfireServer();
-			  app.UseHangfireDashboard(options: new DashboardOptions
-        {
-          Authorization = new [] { new DisableHangfireDashboardAuthorizationFilter() }
-        });
-      });
+            policy.Execute(() =>
+            {
+                app.UseHangfireServer();
+                app.UseHangfireDashboard(options: new DashboardOptions
+                {
+                  Authorization = new [] { new DisableHangfireDashboardAuthorizationFilter() }
+                });
+            });
 
-			var fareDealScanOptions = this.Configuration.GetSection("FareDealScan").Get<FareDealScanOptions>();
-			var fareDealsBotsProxy = app.ApplicationServices.GetService<IFareDealScanProxy>();
+            var schedulerOptions = this.Configuration.GetSection("Scheduler").Get<SchedulerOptions>();
+            var fareDealsBotsProxy = app.ApplicationServices.GetService<IFareDealScanProxy>();
 
-			RecurringJob.AddOrUpdate("Trigger-FareDealsScan", () => fareDealsBotsProxy.TriggerFareDealsScan(), fareDealScanOptions.ScheduleCronExpression);
+            RecurringJob.AddOrUpdate(schedulerOptions.SingaporeAirlines.JobId, () => fareDealsBotsProxy.TriggerFareDealsScan(), schedulerOptions.SingaporeAirlines.CronExpression);
 		}
 	}
 }
